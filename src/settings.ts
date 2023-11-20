@@ -1,78 +1,140 @@
-import { PluginSettingTab, Setting, ButtonComponent, App, TextAreaComponent, SearchComponent, TextComponent } from "obsidian";
+import { PluginSettingTab, Setting, ButtonComponent, App, TextAreaComponent, SearchComponent, TextComponent, requestUrl } from "obsidian";
 import { LogWindow } from "./log";
 import KSyncPlugin from "./main";
-import { Socket } from "./socket";
+import { Socket, SocketState } from "./socket";
+import { logger } from "./lib/constants";
+import { inspect } from "util";
+import possiblyHost from "./util/possiblyHost";
 
 export class SampleSettingTab extends PluginSettingTab {
 	plugin: KSyncPlugin;
+	loggerWindow: LogWindow;
 
 	constructor(app: App, plugin: KSyncPlugin) {
 		super(app, plugin);
+
 		this.plugin = plugin;
 	}
 
 	display(): void {
-		const {containerEl} = this;
+		const { containerEl: container } = this;
 
-		containerEl.empty();
+		container.empty();
 
-		new Setting(containerEl).setHeading().setName("Account")
+		new Setting(container)
+			.setHeading()
+			.setName("Account");
 
-		new Setting(containerEl)
-			.setName('Login')
-			.setDesc('KSync account login')
+		new Setting(container)
+			.setName("Login")
+			.setDesc("KSync account login")
 			.addText(text => text
-				.setPlaceholder('Enter your login')
+				.setPlaceholder("Enter your login")
 				.setValue(this.plugin.settings.login)
 				.onChange(async (value) => {
 					this.plugin.settings.login = value;
+
 					await this.plugin.saveSettings();
 				}));
 
-        new Setting(containerEl)
-			.setName('Password')
-			.setDesc('KSync account password')
+		new Setting(container)
+			.setName("Password")
+			.setDesc("KSync account password")
 			.addText(text => text
-				.setPlaceholder('Enter your password')
+				.setPlaceholder("Enter your password")
 				.setValue(this.plugin.settings.password)
 				.onChange(async (value) => {
 					this.plugin.settings.password = value;
+
 					await this.plugin.saveSettings();
 				}));
 
-		new Setting(containerEl).setHeading().setName("Logs")
-        let log = new LogWindow(containerEl)
-		for (let i = 0; i < 100; i++) {
-			log.addLine("[Sync]: log"+i)
-		}
-		
-        new Setting(containerEl).setHeading().setName("Status")
+		new Setting(container)
+			.setHeading()
+			.setName("Status");
 
-		new Setting(containerEl)
-		.setName("Start KSync")
-		.setDesc("Sync process startup")
-		.addToggle(toggle => toggle
-			.setValue(this.plugin.socket?.connected || false)
-			.onChange(async (value) => {
-				if(value) {
-					this.plugin.socket = new Socket(this.plugin.settings.server);
-					this.plugin.socket.ws.onerror = function() {
-						toggle.setValue(false);
+		new Setting(container)
+			.setName("Start KSync")
+			.setDesc("Synchronization process startup")
+			.addButton(button => button
+				.setButtonText("Start")
+				.setDisabled(this.plugin.socket?.state == SocketState.Connected)
+				.onClick(async (_) => {
+					button.setDisabled(true);
+
+					const { login, password, session, server } = this.plugin.settings;
+
+					logger.info("Checking for session...");
+
+					if (!session || session.trim() == String.empty) {
+						logger.warning("Session does not exist! Creating...");
+
+						const address = possiblyHost(server, "http");
+						const response = await requestUrl({
+							url: `${address}/sessions`,
+							headers: {
+								"Content-Type": "application/json"
+							},
+							body: JSON.stringify({ username: login, password }),
+							method: "POST"
+						});
+
+						logger.info(response.status.toString());
+
+						if (response.status == 200) {
+							logger.info("Successfully created a session.");
+
+							const { token }: { token: string } = response.json;
+
+							this.plugin.settings.session = token;
+						} else if (response.status == 404) {
+							logger.error("User also does not exist!");
+
+							// TODO (Aiving): Create user if does not exist and try to start a session again (ahah).
+						}
 					}
-				} else {
-					delete this.plugin.socket;
-				}
-			})
-		)
-		new Setting(containerEl)
-		.setName('Server address')
-		.setDesc('KSync server endpoint')
-		.addText(text => text
-			.setPlaceholder('Enter server address')
-			.setValue(this.plugin.settings.server)
-			.onChange(async (value) => {
-				this.plugin.settings.server = value;
-				await this.plugin.saveSettings();
-			}));
+
+					const socket = new Socket(`${server}?session=${this.plugin.settings.session}`);
+
+					logger.info("[Server] Connecting...");
+
+					socket.on("open", () => {
+						button.setDisabled(true);
+
+						logger.info("[Server] Successfully conected!")
+					});
+					socket.on("message", (message) => logger.info(`[Server] ${message.data}`));
+					socket.on("error", (event) => {
+						logger.error(`[Server] ${event.name}: ${event.message}`);
+
+						button.setDisabled(false)
+					});
+					socket.on("close", (event) => {
+						logger.fatal(`[Server] Closed with code ${event.code}${typeof event.reason !== "undefined" && event.reason !== String.empty ? ` and reason: ${event.reason}` : String.empty}.`);
+
+						button.setDisabled(false);
+					});
+
+					this.plugin.socket = socket;
+				})
+			);
+
+		new Setting(container)
+			.setName("Server address")
+			.setDesc("KSync server address")
+			.addText(text => text
+				.setPlaceholder("localhost:8000")
+				.setValue(this.plugin.settings.server)
+				.onChange(async (value) => {
+					this.plugin.settings.server = value;
+
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(container)
+			.setHeading()
+			.setName("Logs");
+
+		this.loggerWindow = new LogWindow(container);
 	}
 }

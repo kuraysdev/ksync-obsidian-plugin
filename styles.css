@@ -13,16 +13,37 @@ If your plugin does not need CSS, delete this file.
     overflow-y: auto;
     border: var(--input-border-width) solid var(--background-modifier-border);
     border-radius: var(--input-radius);
-    color: var(--text-normal);
 }
-  
+
 .log-list {
     list-style-type: none;
-    padding: 0;
+    padding: 5px;
     margin: 0;
 }
-  
+
 .log-item {
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.default-line {
+    color: var(--text-normal);
+}
+
+.info-line {
+    color: var(--color-cyan);
+}
+
+.warn-line {
+    color: var(--color-yellow);
+}
+
+.error-line {
+    color: rgba(var(--color-red-rgb), 0.8);
+}
+
+.fatal-line {
+    color: var(--color-red);
 }
