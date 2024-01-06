@@ -1,8 +1,9 @@
-import { App, Component, MarkdownRenderer, Modal, moment, Plugin, TFile, TFolder } from "obsidian";
+import { App, Component, MarkdownRenderer, Modal, moment, Plugin, TFile, TFolder, Vault } from "obsidian";
 import { SampleSettingTab as KSyncSettingTab } from "./settings";
 import { Socket } from "./socket";
 import "./prepare";
 import { Frame, FrameData, FrameOPCode } from "./types/socket";
+import { MD5 } from "./util/FileUtil";
 
 interface KSyncSettings {
 	login: string;
@@ -37,6 +38,13 @@ export default class KSyncPlugin extends Plugin {
 
 		this.addRibbonIcon("cloud", "KSync", (evt: MouseEvent) => new SampleModal(this.app).open());
 		this.addSettingTab(new KSyncSettingTab(this.app, this));
+		this.addCommand({
+			id: "sync",
+			name: "Sync Vault",
+			callback: () => {
+			  console.log("Hey, you!");
+			},
+		  });
 	}
 
 	registerEvents() {
@@ -78,18 +86,18 @@ class SampleModal extends Modal {
 		super(app);
 	}
 
-	onOpen() {
+	async onOpen() {
 		const { contentEl } = this;
 
 		contentEl.setText("Woah!");
 
-		const files = this.app.vault.getMarkdownFiles()
-
+		const files = this.app.vault.getFiles()
+		let test = ""
 		for (let i = 0; i < files.length; i++) {
-			contentEl.appendText(files[i].path);
+			test+=files[i].path+" "+files[i].stat.size/1024/1024+"MB"+" MD5:"+MD5(await files[i].vault.read(files[i]))+"\n"
 		}
 
-		MarkdownRenderer.render(this.app, "```html\n" + "asdasd" + "\n```", contentEl, "", new Component());
+		MarkdownRenderer.render(this.app, "```html\n" + test + "\n```", contentEl, "", new Component());
 	}
 
 	onClose() {
