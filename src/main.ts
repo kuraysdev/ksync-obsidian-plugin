@@ -3,8 +3,7 @@ import { SampleSettingTab as KSyncSettingTab } from "./settings";
 import { Socket } from "./socket";
 import "./prepare";
 import { Frame, FrameData, FrameOPCode } from "./types/socket";
-import { MD5 } from "./util/FileUtil";
-import {md5} from "pure-md5";
+import { hash } from "./util/FileUtil";
 
 interface KSyncSettings {
 	login: string;
@@ -97,8 +96,8 @@ class SampleModal extends Modal {
 		for (let i = 0; i < files.length; i++) {
 			test+=files[i].path+
 			"\n Size:"+files[i].stat.size/1024/1024+"MB"+
-			"\n MD5:"+md5(await files[i].vault.read(files[i]))+
-			"\n lut:"+new Date(files[i].stat.mtime).toString()+
+			"\n Hash:"+await hash(await files[i].vault.read(files[i]))+
+			"\n mtime:"+new Date(files[i].stat.mtime).toString()+
 			"\n"
 		}
 
