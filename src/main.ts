@@ -95,7 +95,6 @@ class SampleModal extends Modal {
 		const files = this.app.vault.getFiles()
 		let test = ""
 		for (let i = 0; i < files.length; i++) {
-			console.log(new Buffer(await files[i].vault.read(files[i])))
 			test+=files[i].path+
 			"\n Size:"+files[i].stat.size/1024/1024+"MB"+
 			"\n MD5:"+md5(await files[i].vault.read(files[i]))+
