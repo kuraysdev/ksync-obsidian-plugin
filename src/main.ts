@@ -4,6 +4,7 @@ import { Socket } from "./socket";
 import "./prepare";
 import { Frame, FrameData, FrameOPCode } from "./types/socket";
 import { hash } from "./util/FileUtil";
+import { LoginModal } from "./login";
 
 interface KSyncSettings {
 	login: string;
@@ -45,6 +46,14 @@ export default class KSyncPlugin extends Plugin {
 			  console.log("Hey, you!");
 			},
 		  });
+		
+		this.addCommand({
+			id: "login",
+			name: "Open Login Modal",
+			callback: () => {
+				new LoginModal(this.app).open()
+			},
+		});
 	}
 
 	registerEvents() {

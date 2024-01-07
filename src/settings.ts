@@ -1,4 +1,4 @@
-import { PluginSettingTab, Setting, ButtonComponent, App, TextAreaComponent, SearchComponent, TextComponent, requestUrl } from "obsidian";
+import { PluginSettingTab, Setting, ButtonComponent, App, TextAreaComponent, SearchComponent, TextComponent, requestUrl, SliderComponent } from "obsidian";
 import { LogWindow } from "./log";
 import KSyncPlugin from "./main";
 import { Socket, SocketState } from "./socket";
@@ -51,7 +51,11 @@ export class SampleSettingTab extends PluginSettingTab {
 
 		new Setting(container)
 			.setHeading()
-			.setName("Status");
+			.setName("Status: 0.4/1GB used");
+
+		const progressBarContainer = container.createEl("div",{cls: "space-progress-bar",});
+		const progressBar = progressBarContainer.createEl("div").setCssStyles({width: `40%`,});
+		
 
 		new Setting(container)
 			.setName("Start KSync")

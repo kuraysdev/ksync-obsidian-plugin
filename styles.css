@@ -47,3 +47,17 @@ If your plugin does not need CSS, delete this file.
 .fatal-line {
     color: var(--color-red);
 }
+
+
+.space-progress-bar {
+    overflow: hidden;
+    height: 10px;
+    border-radius: var(--input-radius);
+    background-color: #ddd;
+}
+  
+.space-progress-bar div {
+    height: 100%;
+    width: 0;
+    background-color: var(--interactive-accent)
+}
