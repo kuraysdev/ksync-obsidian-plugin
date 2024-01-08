@@ -59,5 +59,9 @@ If your plugin does not need CSS, delete this file.
 .space-progress-bar div {
     height: 100%;
     width: 0;
-    background-color: var(--interactive-accent)
+    background-color: var(--interactive-accent);
+}
+
+.no-space {
+    background-color: var(--color-red) !important;
 }

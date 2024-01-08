@@ -1,4 +1,4 @@
-import { App, Modal, Setting } from "obsidian";
+import { App, ButtonComponent, Modal, Setting } from "obsidian";
 
 export class LoginModal extends Modal {
 	constructor(app: App) {
@@ -24,6 +24,8 @@ export class LoginModal extends Modal {
 			.addText(text => text
 				.setPlaceholder("Sussy password")
 				)
+
+		new ButtonComponent(contentEl).setButtonText("Login")
 	}
 
 	onClose() {

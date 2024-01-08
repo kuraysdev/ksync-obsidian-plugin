@@ -1,9 +1,9 @@
 {
 	"id": "ksync",
 	"name": "KSync",
-	"version": "1.0.0",
+	"version": "0.0.1",
 	"minAppVersion": "0.15.0",
-	"description": "This is a yet another synchronization plugin for Obsidian.",
+	"description": "KastenSync synchronization plugin for Obsidian.",
 	"author": "Kurays",
 	"authorUrl": "https://obsidian.md",
 	"fundingUrl": "https://obsidian.md/pricing",

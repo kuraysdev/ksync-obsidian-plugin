@@ -25,36 +25,51 @@ export class SampleSettingTab extends PluginSettingTab {
 			.setHeading()
 			.setName("Account");
 
-		new Setting(container)
-			.setName("Login")
-			.setDesc("KSync account login")
-			.addText(text => text
-				.setPlaceholder("Enter your login")
-				.setValue(this.plugin.settings.login)
-				.onChange(async (value) => {
-					this.plugin.settings.login = value;
-
-					await this.plugin.saveSettings();
-				}));
 
 		new Setting(container)
-			.setName("Password")
-			.setDesc("KSync account password")
-			.addText(text => text
-				.setPlaceholder("Enter your password")
-				.setValue(this.plugin.settings.password)
-				.onChange(async (value) => {
-					this.plugin.settings.password = value;
+			.setName(`Account: ${"me@kurays.dev"}`)
+			.setDesc("Subscription: Basic")
+			.addButton(button => button
+				.setButtonText("Logout")
+				.onClick(async (_) => {
+					logger.info("Using offical server")
+					logger.log("Logged in: me@kurays.dev")
+					logger.error("You are ran out of space!")
+					logger.fatal("Cannot sync! Server error")
+				})
+			)
 
-					await this.plugin.saveSettings();
-				}));
+
+		// new Setting(container)
+		// 	.setName("Login")
+		// 	.setDesc("KSync account login")
+		// 	.addText(text => text
+		// 		.setPlaceholder("Enter your login")
+		// 		.setValue(this.plugin.settings.login)
+		// 		.onChange(async (value) => {
+		// 			this.plugin.settings.login = value;
+
+		// 			await this.plugin.saveSettings();
+		// 		}));
+
+		// new Setting(container)
+		// 	.setName("Password")
+		// 	.setDesc("KSync account password")
+		// 	.addText(text => text
+		// 		.setPlaceholder("Enter your password")
+		// 		.setValue(this.plugin.settings.password)
+		// 		.onChange(async (value) => {
+		// 			this.plugin.settings.password = value;
+
+		// 			await this.plugin.saveSettings();
+		// 		}));
 
 		new Setting(container)
 			.setHeading()
-			.setName("Status: 0.4/1GB used");
+			.setName("Status: 1/1GB used");
 
-		const progressBarContainer = container.createEl("div",{cls: "space-progress-bar",});
-		const progressBar = progressBarContainer.createEl("div").setCssStyles({width: `40%`,});
+		const progressBarContainer = container.createEl("div", {cls: "space-progress-bar",});
+		const progressBar = progressBarContainer.createEl("div", {cls: "no-space"}).setCssStyles({width: `100%`});
 		
 
 		new Setting(container)
