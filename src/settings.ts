@@ -66,7 +66,7 @@ export class SampleSettingTab extends PluginSettingTab {
 
 		new Setting(container)
 			.setHeading()
-			.setName("Status: 1/1GB used");
+			.setName("Usage: 1/1GB");
 
 		const progressBarContainer = container.createEl("div", {cls: "space-progress-bar",});
 		const progressBar = progressBarContainer.createEl("div", {cls: "no-space"}).setCssStyles({width: `100%`});
