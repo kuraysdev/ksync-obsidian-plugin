@@ -1,6 +1,5 @@
 import { ICloseEvent, IMessageEvent, w3cwebsocket as WebSocket } from "websocket";
 import { logger } from "./lib/constants";
-import { BSON } from "./js/bson";
 import possiblyHost from "./util/possiblyHost";
 
 export interface SocketEvents {
@@ -54,5 +53,5 @@ export class Socket<T> {
         return this;
     }
 
-    public send = (data: T) => this.connection.send(BSON.serialize(data as BSON.Document));
+    public send = (data: T) => this.connection.send(data);
 }
