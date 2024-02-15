@@ -17,15 +17,17 @@ export class LoginModal extends Modal {
 			.setName("Login")
 			.addText(text => text
 				.setPlaceholder("ksync@kurays.dev")
-				)
+			)
 
 		new Setting(contentEl)
 			.setName("Password")
 			.addText(text => text
 				.setPlaceholder("Sussy password")
-				)
+			)
 
-		new ButtonComponent(contentEl).setButtonText("Login")
+		new ButtonComponent(contentEl).setButtonText("Login").onClick(async (_) => {
+			
+		})
 	}
 
 	onClose() {

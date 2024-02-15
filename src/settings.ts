@@ -1,7 +1,6 @@
 import { PluginSettingTab, Setting, ButtonComponent, App, TextAreaComponent, SearchComponent, TextComponent, requestUrl, SliderComponent } from "obsidian";
 import { LogWindow } from "./log";
 import KSyncPlugin from "./main";
-import { Socket, SocketState } from "./socket";
 import { logger } from "./lib/constants";
 import { inspect } from "util";
 import possiblyHost from "./util/possiblyHost";
@@ -23,22 +22,28 @@ export class SampleSettingTab extends PluginSettingTab {
 
 		new Setting(container)
 			.setHeading()
-			.setName("Account");
+			.setName("Аккаунт");
 
 
 		new Setting(container)
-			.setName(`Account: ${"me@kurays.dev"}`)
-			.setDesc("Subscription: Basic")
+			.setName(`Аккаунт: ${"me@kurays.dev"}`)
+			.setDesc("Подписка: Базовая")
 			.addButton(button => button
-				.setButtonText("Logout")
+				.setButtonText("Выйти")
 				.onClick(async (_) => {
-					logger.info("Using offical server")
-					logger.log("Logged in: me@kurays.dev")
-					logger.error("You are ran out of space!")
-					logger.fatal("Cannot sync! Server error")
+					logger.info("Используем официальный сервер")
+					logger.log("Вход в аккаунь: me@kurays.dev")
+					logger.error("Хранилище переполнено!")
+					logger.fatal("Невозможно синхронизировать! Ошибка сервера")
 				})
 			)
-
+		
+		new Setting(container)
+			.setName("Выберите хранилище")
+			.addDropdown(dropdown => dropdown.addOptions({
+				"1": "Plugin Test",
+				"2": "EgorAbramov"
+			}))
 
 		// new Setting(container)
 		// 	.setName("Login")
@@ -66,27 +71,27 @@ export class SampleSettingTab extends PluginSettingTab {
 
 		new Setting(container)
 			.setHeading()
-			.setName("Usage: 1/1GB");
+			.setName("Использование: 0.1/1GB");
 
 		const progressBarContainer = container.createEl("div", {cls: "space-progress-bar",});
-		const progressBar = progressBarContainer.createEl("div", {cls: "no-space"}).setCssStyles({width: `100%`});
+		const progressBar = progressBarContainer.createEl("div", {cls: ""}).setCssStyles({width: `10%`});
 		
 
 		new Setting(container)
-			.setName("Start KSync")
-			.setDesc("Synchronization process startup")
+			.setName("Запустить KSync")
+			.setDesc("Запуск процесса синхронизации")
 			.addButton(button => button
-				.setButtonText("Start")
-				.setDisabled(this.plugin.socket?.state == SocketState.Connected)
+				.setButtonText("Запуск")
+				.setDisabled(this.plugin.api?.state == true)
 				.onClick(async (_) => {
 					button.setDisabled(true);
 
-					const { login, password, session, server } = this.plugin.settings;
+					const { token, server } = this.plugin.settings;
 
-					logger.info("Checking for session...");
+					logger.info("Проверяем сессию...");
 
-					if (!session || session.trim() == String.empty) {
-						logger.warning("Session does not exist! Creating...");
+					if (!token || token === "") {
+						logger.warning("Сессии не существует! Создание...");
 
 						const address = possiblyHost(server, "http");
 						const response = await requestUrl({
@@ -101,48 +106,33 @@ export class SampleSettingTab extends PluginSettingTab {
 						logger.info(response.status.toString());
 
 						if (response.status == 200) {
-							logger.info("Successfully created a session.");
+							logger.info("Сессия успешно создана.");
 
 							const { token }: { token: string } = response.json;
 
 							this.plugin.settings.session = token;
 						} else if (response.status == 404) {
-							logger.error("User also does not exist!");
+							logger.error("Пользователя не существует!");
 
 							// TODO (Aiving): Create user if does not exist and try to start a session again (ahah).
 						}
 					}
 
-					const socket = new Socket(`${server}?session=${this.plugin.settings.session}`);
+					
 
-					logger.info("[Server] Connecting...");
+					logger.info("[Server] Подключение...");
 
-					socket.on("open", () => {
-						button.setDisabled(true);
-
-						logger.info("[Server] Successfully conected!")
-					});
-					socket.on("message", (message) => logger.info(`[Server] ${message.data}`));
-					socket.on("error", (event) => {
-						logger.error(`[Server] ${event.name}: ${event.message}`);
-
-						button.setDisabled(false)
-					});
-					socket.on("close", (event) => {
-						logger.fatal(`[Server] Closed with code ${event.code}${typeof event.reason !== "undefined" && event.reason !== String.empty ? ` and reason: ${event.reason}` : String.empty}.`);
-
-						button.setDisabled(false);
-					});
-
-					this.plugin.socket = socket;
+					
+					
+					//this.plugin.socket = socket;
 				})
 			);
 
 		new Setting(container)
-			.setName("Server address")
-			.setDesc("KSync server address")
+			.setName("Адрес сервера")
+			.setDesc("Адрес сервера KSync")
 			.addText(text => text
-				.setPlaceholder("localhost:8000")
+				.setPlaceholder("ksync.kurays.dev")
 				.setValue(this.plugin.settings.server)
 				.onChange(async (value) => {
 					this.plugin.settings.server = value;
@@ -152,8 +142,12 @@ export class SampleSettingTab extends PluginSettingTab {
 
 		new Setting(container)
 			.setHeading()
-			.setName("Logs");
+			.setName("Логи");
 
 		this.loggerWindow = new LogWindow(container);
+		
+		new Setting(container)
+		.setHeading()
+		.setName("© KSync 2024 | Разработчик Абрамов Егор")
 	}
 }

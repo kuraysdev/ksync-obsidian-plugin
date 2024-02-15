@@ -1,6 +1,5 @@
 import { App, Component, MarkdownRenderer, Modal, moment, Plugin, TFile, TFolder, Vault } from "obsidian";
 import { SampleSettingTab as KSyncSettingTab } from "./settings";
-import { Socket } from "./socket";
 import "./prepare";
 import { Frame, FrameData, FrameOPCode } from "./types/socket";
 import { hash } from "./util/FileUtil";
@@ -8,30 +7,24 @@ import { LoginModal } from "./modals/login";
 import { SampleModal } from "./modals/debug";
 
 interface KSyncSettings {
-	login: string;
-	password: string;
-	
-	session: string;
+	token: string;
 
 	server: string;
-	encryption: string;
+	encryption: boolean;
 }
 
 const DEFAULT_SETTINGS: KSyncSettings = {
-	login: String.empty,
-	password: String.empty,
-
-	session: String.empty,
+	token: "",
 
 	server: "https://ksync.kurays.dev",
-	encryption: String.empty
+	encryption: false
 }
 
 export default class KSyncPlugin extends Plugin {
 	settings: KSyncSettings;
 	statusbar: HTMLElement;
 
-	socket?: Socket<Frame>;
+	api: any;
 
 	async onload() {
 		await this.loadSettings();
