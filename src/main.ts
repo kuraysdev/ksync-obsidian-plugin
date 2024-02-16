@@ -1,10 +1,9 @@
 import { App, Component, MarkdownRenderer, Modal, moment, Plugin, TFile, TFolder, Vault } from "obsidian";
 import { SampleSettingTab as KSyncSettingTab } from "./settings";
-import "./prepare";
-import { Frame, FrameData, FrameOPCode } from "./types/socket";
 import { hash } from "./util/FileUtil";
 import { LoginModal } from "./modals/login";
 import { SampleModal } from "./modals/debug";
+import { API } from "./services/api";
 
 interface KSyncSettings {
 	token: string;
@@ -16,7 +15,7 @@ interface KSyncSettings {
 const DEFAULT_SETTINGS: KSyncSettings = {
 	token: "",
 
-	server: "https://ksync.kurays.dev",
+	server: "http://localhost:8000",
 	encryption: false
 }
 
@@ -24,14 +23,16 @@ export default class KSyncPlugin extends Plugin {
 	settings: KSyncSettings;
 	statusbar: HTMLElement;
 
-	api: any;
+	api: API;
 
 	async onload() {
 		await this.loadSettings();
 
 		this.registerEvents();
 
-		this.addRibbonIcon("cloud", "KSync", (evt: MouseEvent) => new SampleModal(this.app).open());
+		this.api = new API(this.settings.server);
+
+		this.addRibbonIcon("cloud", "KSync", (evt: MouseEvent) => new SampleModal(this.app, this).open());
 		this.addSettingTab(new KSyncSettingTab(this.app, this));
 		this.addCommand({
 			id: "sync",
@@ -45,7 +46,7 @@ export default class KSyncPlugin extends Plugin {
 			id: "login",
 			name: "Open Login Modal",
 			callback: () => {
-				new LoginModal(this.app).open()
+				new LoginModal(this.app, this).open()
 			},
 		});
 	}

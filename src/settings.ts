@@ -82,7 +82,7 @@ export class SampleSettingTab extends PluginSettingTab {
 			.setDesc("Запуск процесса синхронизации")
 			.addButton(button => button
 				.setButtonText("Запуск")
-				.setDisabled(this.plugin.api?.state == true)
+				.setDisabled(true)
 				.onClick(async (_) => {
 					button.setDisabled(true);
 
@@ -94,28 +94,28 @@ export class SampleSettingTab extends PluginSettingTab {
 						logger.warning("Сессии не существует! Создание...");
 
 						const address = possiblyHost(server, "http");
-						const response = await requestUrl({
-							url: `${address}/sessions`,
-							headers: {
-								"Content-Type": "application/json"
-							},
-							body: JSON.stringify({ username: login, password }),
-							method: "POST"
-						});
+						// const response = await requestUrl({
+						// 	url: `${address}/sessions`,
+						// 	headers: {
+						// 		"Content-Type": "application/json"
+						// 	},
+						// 	body: JSON.stringify({ username: login, password }),
+						// 	method: "POST"
+						// });
 
-						logger.info(response.status.toString());
+						// logger.info(response.status.toString());
 
-						if (response.status == 200) {
-							logger.info("Сессия успешно создана.");
+						// if (response.status == 200) {
+						// 	logger.info("Сессия успешно создана.");
 
-							const { token }: { token: string } = response.json;
+						// 	const { token }: { token: string } = response.json;
 
-							this.plugin.settings.session = token;
-						} else if (response.status == 404) {
-							logger.error("Пользователя не существует!");
+						// 	this.plugin.settings.session = token;
+						// } else if (response.status == 404) {
+						// 	logger.error("Пользователя не существует!");
 
-							// TODO (Aiving): Create user if does not exist and try to start a session again (ahah).
-						}
+						// 	// TODO (Aiving): Create user if does not exist and try to start a session again (ahah).
+						// }
 					}
 
 					
