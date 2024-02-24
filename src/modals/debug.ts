@@ -1,8 +1,9 @@
 import { Modal, App, MarkdownRenderer, Component } from "obsidian";
+import KSyncPlugin from "src/main";
 import { hash, humanFileSize } from "src/util/FileUtil";
 
 export class SampleModal extends Modal {
-	constructor(app: App) {
+	constructor(app: App, plugin: KSyncPlugin) {
 		super(app);
 	}
 

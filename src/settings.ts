@@ -4,6 +4,7 @@ import KSyncPlugin from "./main";
 import { logger } from "./lib/constants";
 import { inspect } from "util";
 import possiblyHost from "./util/possiblyHost";
+import { LoginModal } from "./modals/login";
 
 export class SampleSettingTab extends PluginSettingTab {
 	plugin: KSyncPlugin;
@@ -15,35 +16,50 @@ export class SampleSettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 	}
 
-	display(): void {
+	async display(): Promise<void> {
 		const { containerEl: container } = this;
 
 		container.empty();
+
+		const data = await this.plugin.api.axios.get("/user", {
+			headers: { Authorization: this.plugin.settings.token }
+		})
 
 		new Setting(container)
 			.setHeading()
 			.setName("Аккаунт");
 
-
-		new Setting(container)
-			.setName(`Аккаунт: ${"me@kurays.dev"}`)
-			.setDesc("Подписка: Базовая")
+		if(this.plugin.settings.token === "") {
+			new Setting(container)
+			.setName(`Вы не вошли в аккаунт`)
+			.addButton(button => button
+				.setButtonText("Войти")
+				.onClick(async (_) => {
+					new LoginModal(this.app, this.plugin).open()
+					logger.info("Используем официальный сервер")
+				})
+			)
+		} else {
+			new Setting(container)
+			.setName(`Аккаунт: ${data.data.email}`)
+			.setDesc(`Подписка: ${data.data.sub}`)
 			.addButton(button => button
 				.setButtonText("Выйти")
 				.onClick(async (_) => {
-					logger.info("Используем официальный сервер")
-					logger.log("Вход в аккаунь: me@kurays.dev")
-					logger.error("Хранилище переполнено!")
-					logger.fatal("Невозможно синхронизировать! Ошибка сервера")
+					this.plugin.settings.token = ""
+					this.plugin.saveSettings()
+					this.display()
 				})
 			)
 		
-		new Setting(container)
-			.setName("Выберите хранилище")
-			.addDropdown(dropdown => dropdown.addOptions({
-				"1": "Plugin Test",
+			new Setting(container)
+				.setName("Выберите хранилище")
+				.addDropdown(dropdown => dropdown.addOptions({
+				"1": this.app.vault.getName(),
 				"2": "EgorAbramov"
-			}))
+				})
+				.setDisabled(true)
+			)
 
 		// new Setting(container)
 		// 	.setName("Login")
@@ -69,12 +85,14 @@ export class SampleSettingTab extends PluginSettingTab {
 		// 			await this.plugin.saveSettings();
 		// 		}));
 
-		new Setting(container)
+			new Setting(container)
 			.setHeading()
-			.setName("Использование: 0.1/1GB");
+			.setName(`Использование: 5/${data.data.space}`);
 
-		const progressBarContainer = container.createEl("div", {cls: "space-progress-bar",});
-		const progressBar = progressBarContainer.createEl("div", {cls: ""}).setCssStyles({width: `10%`});
+			const progressBarContainer = container.createEl("div", {cls: "space-progress-bar",});
+			const progressBar = progressBarContainer.createEl("div", {cls: ""}).setCssStyles({width: `10%`});
+		}
+		
 		
 
 		new Setting(container)

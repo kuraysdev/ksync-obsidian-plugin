@@ -19,10 +19,10 @@ export class LoginModal extends Modal {
 
 		new Setting(contentEl)
 			.setHeading()
-			.setName("Login into your account");
+			.setName("Вход в ваш аккаунт");
 
 		new Setting(contentEl)
-			.setName("Login")
+			.setName("Логин")
 			.addText(text => text
 				.setPlaceholder("mail@example.com")
 				.setValue(this.login)
@@ -32,20 +32,27 @@ export class LoginModal extends Modal {
 			)
 
 		new Setting(contentEl)
-			.setName("Password")
+			.setName("Пароль")
 			.addText(text => text
 				.setPlaceholder("Sussy password")
 				.setValue(this.password)
 			 	.onChange(async (value) => {
 			 		this.password = value;
 				})
+				.inputEl.setAttr("type", "password")
+				
+				
 			)
 
-		new ButtonComponent(contentEl).setButtonText("Login").onClick(async (_) => {
+		new ButtonComponent(contentEl).setButtonText("Войти").onClick(async (_) => {
 			const data = await this.plugin.api.axios.post("/user/login", {
 				login: this.login, 
 				password: this.password
 			})
+			this.plugin.settings.token = data.data.token
+			this.plugin.saveSettings()
+			this.close()
+			this.plugin.settingsTab.display()
 		})
 	}
 

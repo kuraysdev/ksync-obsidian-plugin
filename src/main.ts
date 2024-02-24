@@ -7,6 +7,7 @@ import { API } from "./services/api";
 
 interface KSyncSettings {
 	token: string;
+	vaultid: number;
 
 	server: string;
 	encryption: boolean;
@@ -14,26 +15,27 @@ interface KSyncSettings {
 
 const DEFAULT_SETTINGS: KSyncSettings = {
 	token: "",
-
+	vaultid: 0,
 	server: "http://localhost:8000",
 	encryption: false
 }
 
 export default class KSyncPlugin extends Plugin {
 	settings: KSyncSettings;
+	settingsTab: KSyncSettingTab
 	statusbar: HTMLElement;
 
 	api: API;
 
 	async onload() {
 		await this.loadSettings();
-
+		this.settingsTab = new KSyncSettingTab(this.app, this)
 		this.registerEvents();
 
 		this.api = new API(this.settings.server);
 
 		this.addRibbonIcon("cloud", "KSync", (evt: MouseEvent) => new SampleModal(this.app, this).open());
-		this.addSettingTab(new KSyncSettingTab(this.app, this));
+		this.addSettingTab(this.settingsTab);
 		this.addCommand({
 			id: "sync",
 			name: "Sync Vault",
