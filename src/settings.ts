@@ -21,10 +21,6 @@ export class SampleSettingTab extends PluginSettingTab {
 
 		container.empty();
 
-		const data = await this.plugin.api.axios.get("/user", {
-			headers: { Authorization: this.plugin.settings.token }
-		})
-
 		new Setting(container)
 			.setHeading()
 			.setName("Аккаунт");
@@ -40,6 +36,10 @@ export class SampleSettingTab extends PluginSettingTab {
 				})
 			)
 		} else {
+			const data = await this.plugin.api.axios.get("/user", {
+				headers: { Authorization: this.plugin.settings.token }
+			})
+			
 			new Setting(container)
 			.setName(`Аккаунт: ${data.data.email}`)
 			.setDesc(`Подписка: ${data.data.sub}`)

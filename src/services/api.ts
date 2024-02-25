@@ -7,6 +7,14 @@ export class API {
             baseURL: url,
             timeout: 1000,
             headers: {'Content-Type': 'application/json'}
-          });
+        });
+    }
+
+    async CheckApi() {
+        let data = await this.axios.get('/health').catch(function (error) {
+            return false
+        });;
+        console.log(data);
+        return data;
     }
 }
