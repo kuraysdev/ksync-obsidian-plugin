@@ -4,8 +4,7 @@ import { hash } from "./util/FileUtil";
 import { LoginModal } from "./modals/login";
 import { SampleModal } from "./modals/debug";
 import { API } from "./services/api";
-import { logger } from "./lib/constants";
-
+import { Logger } from "./util/Logger";
 interface KSyncSettings {
 	token: string;
 	vaultid: number;
@@ -25,10 +24,12 @@ export default class KSyncPlugin extends Plugin {
 	settings: KSyncSettings;
 	settingsTab: KSyncSettingTab
 	statusbar: HTMLElement;
-
+	
+	logger: Logger;
 	api: API;
 
 	async onload() {
+		this.logger = new Logger();
 		await this.loadSettings();
 		this.settingsTab = new KSyncSettingTab(this.app, this)
 		this.registerEvents();
@@ -57,8 +58,7 @@ export default class KSyncPlugin extends Plugin {
 		});
 
 		if(!status) {
-			//logger.fatal("Сервер не отвечает!");
-			console.log("Сервер не отвечает")
+			this.logger.fatal("Сервер не отвечает!");
 			this.settings.token = "";
 			this.saveSettings();
 		}

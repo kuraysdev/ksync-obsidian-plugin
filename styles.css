@@ -65,3 +65,8 @@ If your plugin does not need CSS, delete this file.
 .no-space {
     background-color: var(--color-red) !important;
 }
+
+
+.fatal {
+    background-color: var(--color-red) !important;
+}

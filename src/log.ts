@@ -1,12 +1,11 @@
 import { getIcon } from "obsidian";
-import { LogItem, LogState } from "./util/Logger";
+import { LogItem, LogState, Logger } from "./util/Logger";
 import match from "./util/match";
-import { logger } from "./lib/constants";
 
 export class LogWindow {
-    private log: HTMLElement
+    private log: HTMLElement;
 
-    constructor(el: HTMLElement) {
+    constructor(el: HTMLElement, logger: Logger) {
         this.log = el.createEl("div", { cls: "log-window" });
         this.log = this.log.createEl("ul", { cls: "log-list" });
 

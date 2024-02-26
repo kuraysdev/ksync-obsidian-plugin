@@ -1,3 +1,5 @@
+import { Notice } from "obsidian";
+
 export interface LogItem {
     state: LogState,
     message: string
@@ -14,8 +16,11 @@ export enum LogState {
 export type LogFunction = (item: LogItem) => void;
 
 export class Logger {
-    private logFunction: LogFunction;
     public items: LogItem[] = [];
+
+    private logFunction = (item: LogItem) => {
+        this.items.push(item);
+    }
 
     public onLog = (func: LogFunction) => {
         this.logFunction = (item) => {
@@ -31,5 +36,8 @@ export class Logger {
     public info = (message: string) => this._log(LogState.Information, message);
     public warning = (message: string) => this._log(LogState.Warning, message);
     public error = (message: string) => this._log(LogState.Error, message);
-    public fatal = (message: string) => this._log(LogState.Fatal, message);
+    public fatal = (message: string) => { 
+        this._log(LogState.Fatal, message);
+        new Notice(message);
+    };
 }

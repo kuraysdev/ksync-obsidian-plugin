@@ -1,19 +1,21 @@
 import { PluginSettingTab, Setting, ButtonComponent, App, TextAreaComponent, SearchComponent, TextComponent, requestUrl, SliderComponent } from "obsidian";
 import { LogWindow } from "./log";
 import KSyncPlugin from "./main";
-import { logger } from "./lib/constants";
 import { inspect } from "util";
 import possiblyHost from "./util/possiblyHost";
 import { LoginModal } from "./modals/login";
+import { Logger } from "./util/Logger";
 
 export class SampleSettingTab extends PluginSettingTab {
 	plugin: KSyncPlugin;
+	logger: Logger;
 	loggerWindow: LogWindow;
 
 	constructor(app: App, plugin: KSyncPlugin) {
 		super(app, plugin);
 
 		this.plugin = plugin;
+		this.logger = plugin.logger;
 	}
 
 	async display(): Promise<void> {
@@ -32,7 +34,7 @@ export class SampleSettingTab extends PluginSettingTab {
 				.setButtonText("Войти")
 				.onClick(async (_) => {
 					new LoginModal(this.app, this.plugin).open()
-					logger.info("Используем официальный сервер")
+					this.logger.info("Используем официальный сервер")
 				})
 			)
 		} else {
@@ -106,10 +108,10 @@ export class SampleSettingTab extends PluginSettingTab {
 
 					const { token, server } = this.plugin.settings;
 
-					logger.info("Проверяем сессию...");
+					this.logger.info("Проверяем сессию...");
 
 					if (!token || token === "") {
-						logger.warning("Сессии не существует! Создание...");
+						this.logger.warning("Сессии не существует! Создание...");
 
 						const address = possiblyHost(server, "http");
 						// const response = await requestUrl({
@@ -138,7 +140,7 @@ export class SampleSettingTab extends PluginSettingTab {
 
 					
 
-					logger.info("[Server] Подключение...");
+					this.logger.info("[Server] Подключение...");
 
 					
 					
@@ -162,7 +164,7 @@ export class SampleSettingTab extends PluginSettingTab {
 			.setHeading()
 			.setName("Логи");
 
-		this.loggerWindow = new LogWindow(container);
+		this.loggerWindow = new LogWindow(container, this.logger);
 		
 		new Setting(container)
 		.setHeading()

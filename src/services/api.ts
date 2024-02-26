@@ -14,7 +14,6 @@ export class API {
         let data = await this.axios.get('/health').catch(function (error) {
             return false
         });;
-        console.log(data);
         return data;
     }
 }
