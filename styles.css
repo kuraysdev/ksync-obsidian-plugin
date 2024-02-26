@@ -54,6 +54,7 @@ If your plugin does not need CSS, delete this file.
     height: 10px;
     border-radius: var(--input-radius);
     background-color: #ddd;
+    margin: 0 0 0.75em 0;
 }
   
 .space-progress-bar div {
