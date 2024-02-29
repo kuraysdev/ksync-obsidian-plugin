@@ -61,6 +61,8 @@ export default class KSyncPlugin extends Plugin {
 			this.logger.fatal("Сервер не отвечает!");
 			this.settings.token = "";
 			this.saveSettings();
+		} else {
+			this.logger.info("Сервер онлайн!");
 		}
 	}
 

@@ -38,13 +38,15 @@ export class SampleSettingTab extends PluginSettingTab {
 				})
 			)
 		} else {
-			const data = await this.plugin.api.axios.get("/user", {
+			const data = (await this.plugin.api.axios.get("/user", {
 				headers: { Authorization: this.plugin.settings.token }
-			})
-			
+			})).data
+			//TODO(Kurays): Move to Account Service
+			this.logger.info("Используем аккаунт "+data.email)
+
 			new Setting(container)
-			.setName(`Аккаунт: ${data.data.email}`)
-			.setDesc(`Подписка: ${data.data.sub}`)
+			.setName(`Аккаунт: ${data.email}`)
+			.setDesc(`Подписка: ${data.sub}`)
 			.addButton(button => button
 				.setButtonText("Выйти")
 				.onClick(async (_) => {
@@ -89,7 +91,7 @@ export class SampleSettingTab extends PluginSettingTab {
 
 			new Setting(container)
 			.setHeading()
-			.setName(`Использование: 5/${data.data.space}`);
+			.setName(`Использование: 5/${data.space}`);
 
 			const progressBarContainer = container.createEl("div", {cls: "space-progress-bar",});
 			const progressBar = progressBarContainer.createEl("div", {cls: ""}).setCssStyles({width: `10%`});
@@ -149,8 +151,8 @@ export class SampleSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(container)
-			.setName("Адрес сервера")
-			.setDesc("Адрес сервера KSync")
+			.setName("Адрес сервера KSync")
+			.setDesc("НЕ РЕКОМЕНДУЕТСЯ МЕНЯТЬ")
 			.addText(text => text
 				.setPlaceholder("ksync.kurays.dev")
 				.setValue(this.plugin.settings.server)
