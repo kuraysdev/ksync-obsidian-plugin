@@ -5,17 +5,21 @@ import { inspect } from "util";
 import possiblyHost from "./util/possiblyHost";
 import { LoginModal } from "./modals/login";
 import { Logger } from "./util/Logger";
+import { DevicesModal } from "./modals/devices";
+import { IAccountData } from "./services/account";
 
 export class SampleSettingTab extends PluginSettingTab {
 	plugin: KSyncPlugin;
 	logger: Logger;
 	loggerWindow: LogWindow;
+	user: IAccountData;
 
 	constructor(app: App, plugin: KSyncPlugin) {
 		super(app, plugin);
 
 		this.plugin = plugin;
 		this.logger = plugin.logger;
+		this.user = this.plugin.account.data;
 	}
 
 	async display(): Promise<void> {
@@ -23,11 +27,23 @@ export class SampleSettingTab extends PluginSettingTab {
 
 		container.empty();
 
+		if(!this.plugin.api.status) {
+			new Setting(container)
+			.setName("Невозможно подключиться к серверу!")
+			.addButton(button => button
+				.setButtonText("Переподключиться")
+				.onClick(async (_) => {
+					this.plugin.api.CheckApi();
+				})
+			)
+		}
+
 		new Setting(container)
 			.setHeading()
 			.setName("Аккаунт");
 
-		if(this.plugin.settings.token === "") {
+		//Проверка есть ли аккаунт и доступно ли API
+		if(this.plugin.settings.token === "" || !this.plugin.api.status) {
 			new Setting(container)
 			.setName(`Вы не вошли в аккаунт`)
 			.addButton(button => button
@@ -38,15 +54,10 @@ export class SampleSettingTab extends PluginSettingTab {
 				})
 			)
 		} else {
-			const data = (await this.plugin.api.axios.get("/user", {
-				headers: { Authorization: this.plugin.settings.token }
-			})).data
-			//TODO(Kurays): Move to Account Service
-			this.logger.info("Используем аккаунт "+data.email)
 
 			new Setting(container)
-			.setName(`Аккаунт: ${data.email}`)
-			.setDesc(`Подписка: ${data.sub}`)
+			.setName(`Аккаунт: ${this.user.email}`)
+			.setDesc(`Подписка: ${this.user.subscription}`)
 			.addButton(button => button
 				.setButtonText("Выйти")
 				.onClick(async (_) => {
@@ -65,33 +76,19 @@ export class SampleSettingTab extends PluginSettingTab {
 				.setDisabled(true)
 			)
 
-		// new Setting(container)
-		// 	.setName("Login")
-		// 	.setDesc("KSync account login")
-		// 	.addText(text => text
-		// 		.setPlaceholder("Enter your login")
-		// 		.setValue(this.plugin.settings.login)
-		// 		.onChange(async (value) => {
-		// 			this.plugin.settings.login = value;
-
-		// 			await this.plugin.saveSettings();
-		// 		}));
-
-		// new Setting(container)
-		// 	.setName("Password")
-		// 	.setDesc("KSync account password")
-		// 	.addText(text => text
-		// 		.setPlaceholder("Enter your password")
-		// 		.setValue(this.plugin.settings.password)
-		// 		.onChange(async (value) => {
-		// 			this.plugin.settings.password = value;
-
-		// 			await this.plugin.saveSettings();
-		// 		}));
+			new Setting(container)
+				.setName("Устройства")
+				.setDesc("Устройства привязанные к аккаунту")
+				.addButton(button => button
+					.setButtonText("Просмотреть")
+					.onClick(async () => {
+						new DevicesModal(this.app, this.plugin).open()
+					})
+				)
 
 			new Setting(container)
-			.setHeading()
-			.setName(`Использование: 5/${data.space}`);
+				.setHeading()
+				.setName(`Использование: 5/${this.user.space}`);
 
 			const progressBarContainer = container.createEl("div", {cls: "space-progress-bar",});
 			const progressBar = progressBarContainer.createEl("div", {cls: ""}).setCssStyles({width: `10%`});
@@ -152,7 +149,7 @@ export class SampleSettingTab extends PluginSettingTab {
 
 		new Setting(container)
 			.setName("Адрес сервера KSync")
-			.setDesc("НЕ РЕКОМЕНДУЕТСЯ МЕНЯТЬ")
+			.setDesc("Укажите нужный вам адрес сервера")
 			.addText(text => text
 				.setPlaceholder("ksync.kurays.dev")
 				.setValue(this.plugin.settings.server)
@@ -160,7 +157,10 @@ export class SampleSettingTab extends PluginSettingTab {
 					this.plugin.settings.server = value;
 
 					await this.plugin.saveSettings();
-				}));
+				})
+			).addButton(button => button
+				.setButtonText("Сменить").setWarning()
+			);
 
 		new Setting(container)
 			.setHeading()

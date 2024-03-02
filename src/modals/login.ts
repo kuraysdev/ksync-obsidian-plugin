@@ -45,12 +45,7 @@ export class LoginModal extends Modal {
 			)
 
 		new ButtonComponent(contentEl).setButtonText("Войти").onClick(async (_) => {
-			const data = await this.plugin.api.axios.post("/user/login", {
-				login: this.login, 
-				password: this.password
-			})
-			this.plugin.settings.token = data.data.token
-			this.plugin.saveSettings()
+			await this.plugin.account.login(this.login, this.password);
 			this.close()
 			this.plugin.settingsTab.display()
 		})

@@ -5,6 +5,7 @@ import { LoginModal } from "./modals/login";
 import { SampleModal } from "./modals/debug";
 import { API } from "./services/api";
 import { Logger } from "./util/Logger";
+import { Account } from "./services/account";
 interface KSyncSettings {
 	token: string;
 	vaultid: number;
@@ -27,18 +28,22 @@ export default class KSyncPlugin extends Plugin {
 	
 	logger: Logger;
 	api: API;
+	account: Account;
 
 	async onload() {
 		this.logger = new Logger();
 		await this.loadSettings();
-		this.settingsTab = new KSyncSettingTab(this.app, this)
 		this.registerEvents();
 
-		this.api = new API(this.settings.server);
-		let status = await this.api.CheckApi()
-		console.log(status);
-		
+		this.api = new API(this, this.settings.server);
+		this.account = new Account(this);
 
+		await this.api.CheckApi()
+		if(this.settings.token) {
+			await this.account.getUser();
+		}
+		
+		this.settingsTab = new KSyncSettingTab(this.app, this)
 		this.addRibbonIcon("cloud", "KSync", (evt: MouseEvent) => new SampleModal(this.app, this).open());
 		this.addSettingTab(this.settingsTab);
 		this.addCommand({
@@ -57,13 +62,6 @@ export default class KSyncPlugin extends Plugin {
 			},
 		});
 
-		if(!status) {
-			this.logger.fatal("Сервер не отвечает!");
-			this.settings.token = "";
-			this.saveSettings();
-		} else {
-			this.logger.info("Сервер онлайн!");
-		}
 	}
 
 	registerEvents() {
