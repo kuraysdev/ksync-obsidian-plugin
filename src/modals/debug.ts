@@ -3,24 +3,28 @@ import KSyncPlugin from "src/main";
 import { hash, humanFileSize } from "src/util/FileUtil";
 
 export class SampleModal extends Modal {
+	public plugin: KSyncPlugin;
 	constructor(app: App, plugin: KSyncPlugin) {
 		super(app);
+
+		this.plugin = plugin;
 	}
 
 	async onOpen() {
 		const { contentEl } = this;
-        const files = await this.app.vault.getFiles().sort((a, b) => b.stat.size - a.stat.size)
-        const size = files.reduce((accumulator, currentFile) => {return accumulator + currentFile.stat.size}, 0);
+		let files = await this.plugin.manager.getMetadata();
+        files = files.sort((a, b) => b.size - a.size)
+        const size = files.reduce((accumulator, currentFile) => {return accumulator + currentFile.size}, 0);
 
 		contentEl.setText(`There is ${files.length} files. Size: ${humanFileSize(size)}`);
 
 		
 		let test = ""
-		for (let i = 0; i < files.length; i++) {
-			test+=files[i].path+
-			"\n Size: "+humanFileSize(files[i].stat.size)+
-			"\n Hash: "+await (await hash(await files[i].vault.read(files[i]))).slice(0, 16)+
-			"\n mtime: "+new Date(files[i].stat.mtime).toLocaleString()+
+		for (const file of files) {
+			test+=file.path+
+			"\n Size: "+humanFileSize(file.size)+
+			"\n Hash: "+file.hash.slice(0, 16)+
+			"\n mtime: "+new Date(file.mtime).toLocaleString()+
 			"\n"
 		}
 

@@ -6,20 +6,20 @@ import possiblyHost from "./util/possiblyHost";
 import { LoginModal } from "./modals/login";
 import { Logger } from "./util/Logger";
 import { DevicesModal } from "./modals/devices";
-import { IAccountData } from "./services/account";
+import { Account } from "./services/account";
 
 export class SampleSettingTab extends PluginSettingTab {
 	plugin: KSyncPlugin;
 	logger: Logger;
 	loggerWindow: LogWindow;
-	user: IAccountData;
+	user: Account;
 
 	constructor(app: App, plugin: KSyncPlugin) {
 		super(app, plugin);
 
 		this.plugin = plugin;
 		this.logger = plugin.logger;
-		this.user = this.plugin.account.data;
+		this.user = this.plugin.account;
 	}
 
 	async display(): Promise<void> {
@@ -56,8 +56,8 @@ export class SampleSettingTab extends PluginSettingTab {
 		} else {
 
 			new Setting(container)
-			.setName(`Аккаунт: ${this.user.email}`)
-			.setDesc(`Подписка: ${this.user.subscription}`)
+			.setName(`Аккаунт: ${this.user.data.email}`)
+			.setDesc(`Подписка: ${this.user.data.subscription}`)
 			.addButton(button => button
 				.setButtonText("Выйти")
 				.onClick(async (_) => {
@@ -88,7 +88,7 @@ export class SampleSettingTab extends PluginSettingTab {
 
 			new Setting(container)
 				.setHeading()
-				.setName(`Использование: 5/${this.user.space}`);
+				.setName(`Использование: 5/${this.user.data.space}`);
 
 			const progressBarContainer = container.createEl("div", {cls: "space-progress-bar",});
 			const progressBar = progressBarContainer.createEl("div", {cls: ""}).setCssStyles({width: `10%`});

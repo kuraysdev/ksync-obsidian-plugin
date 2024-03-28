@@ -6,6 +6,7 @@ import { SampleModal } from "./modals/debug";
 import { API } from "./services/api";
 import { Logger } from "./util/Logger";
 import { Account } from "./services/account";
+import { VaultService } from "./services/vault";
 interface KSyncSettings {
 	token: string;
 	vaultid: number;
@@ -29,6 +30,7 @@ export default class KSyncPlugin extends Plugin {
 	logger: Logger;
 	api: API;
 	account: Account;
+	manager: VaultService;
 
 	async onload() {
 		this.logger = new Logger();
@@ -37,12 +39,13 @@ export default class KSyncPlugin extends Plugin {
 
 		this.api = new API(this, this.settings.server);
 		this.account = new Account(this);
+		this.manager =  new VaultService(this);
 
 		await this.api.CheckApi()
-		if(this.settings.token) {
+		if(this.settings.token && this.api.status) {
+			console.log("test")
 			await this.account.getUser();
 		}
-		
 		this.settingsTab = new KSyncSettingTab(this.app, this)
 		this.addRibbonIcon("cloud", "KSync", (evt: MouseEvent) => new SampleModal(this.app, this).open());
 		this.addSettingTab(this.settingsTab);
@@ -65,6 +68,8 @@ export default class KSyncPlugin extends Plugin {
 	}
 
 	registerEvents() {
+		this.registerEvent(this.app.vault.on("delete", async (file) => this.manager.onDelete(file)));
+
 		// this.registerEvent(this.app.vault.on("create", async (file) => {
 		// 	const { path } = file;
 		// 	const createdAt = new Date((file as TFile).stat.ctime);
