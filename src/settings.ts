@@ -7,6 +7,7 @@ import { LoginModal } from "./modals/login";
 import { Logger } from "./util/Logger";
 import { DevicesModal } from "./modals/devices";
 import { Account } from "./services/account";
+import { VaultsModal } from "./modals/vaults";
 
 export class SampleSettingTab extends PluginSettingTab {
 	plugin: KSyncPlugin;
@@ -67,14 +68,26 @@ export class SampleSettingTab extends PluginSettingTab {
 				})
 			)
 		
+			// new Setting(container)
+			// 	.setName("Выберите хранилище")
+			// 	.addDropdown(dropdown => dropdown.addOptions({
+			// 	"1": this.app.vault.getName(),
+			// 	"2": "EgorAbramov"
+			// 	})
+			// 	.setDisabled(this.plugin.settings.vaultid === 0)
+			// 	.onChange(async (callback) => {
+
+			// 	})
+			// )
 			new Setting(container)
-				.setName("Выберите хранилище")
-				.addDropdown(dropdown => dropdown.addOptions({
-				"1": this.app.vault.getName(),
-				"2": "EgorAbramov"
-				})
-				.setDisabled(true)
-			)
+				.setName(`Хранилища (Выбрано: ${this.user.data.vaults.find(vault => vault.id === this.plugin.settings.vaultid)?.name})`)
+				.setDesc("Выберите используемое хранилище")
+				.addButton(button => button
+					.setButtonText("Просмотреть")
+					.onClick(async () => {
+						new VaultsModal(this.app, this.plugin).open()
+					})
+				)
 
 			new Setting(container)
 				.setName("Устройства")
@@ -95,8 +108,8 @@ export class SampleSettingTab extends PluginSettingTab {
 		}
 		
 		
-
-		new Setting(container)
+		if(this.plugin.settings.vaultid !== 0) {
+			new Setting(container)
 			.setName("Запустить KSync")
 			.setDesc("Запуск процесса синхронизации")
 			.addButton(button => button
@@ -105,47 +118,10 @@ export class SampleSettingTab extends PluginSettingTab {
 				.onClick(async (_) => {
 					button.setDisabled(true);
 
-					const { token, server } = this.plugin.settings;
-
-					this.logger.info("Проверяем сессию...");
-
-					if (!token || token === "") {
-						this.logger.warning("Сессии не существует! Создание...");
-
-						const address = possiblyHost(server, "http");
-						// const response = await requestUrl({
-						// 	url: `${address}/sessions`,
-						// 	headers: {
-						// 		"Content-Type": "application/json"
-						// 	},
-						// 	body: JSON.stringify({ username: login, password }),
-						// 	method: "POST"
-						// });
-
-						// logger.info(response.status.toString());
-
-						// if (response.status == 200) {
-						// 	logger.info("Сессия успешно создана.");
-
-						// 	const { token }: { token: string } = response.json;
-
-						// 	this.plugin.settings.session = token;
-						// } else if (response.status == 404) {
-						// 	logger.error("Пользователя не существует!");
-
-						// 	// TODO (Aiving): Create user if does not exist and try to start a session again (ahah).
-						// }
-					}
-
-					
-
-					this.logger.info("[Server] Подключение...");
-
-					
-					
-					//this.plugin.socket = socket;
 				})
 			);
+		}
+		
 
 		new Setting(container)
 			.setName("Адрес сервера KSync")

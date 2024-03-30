@@ -54,6 +54,7 @@ export default class KSyncPlugin extends Plugin {
 			name: "Sync Vault",
 			callback: () => {
 			  console.log("Hey, you!");
+			  this.manager.sync()
 			},
 		  });
 		

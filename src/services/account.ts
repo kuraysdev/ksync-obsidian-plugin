@@ -20,12 +20,15 @@ export class Account {
 
     async getUser() {
         const user = await this.GetData();
-        this.plugin.logger.info("Используем аккаунт "+user.email)
-        this.data = {
-            email: user.email,
-            subscription: user.sub,
-            space: user.space
-        }
+        this.data = user;
+    }
+
+    async createVault(name: string) {
+        const data = (await this.plugin.api.axios.post("/vault/create", {
+            headers: { Authorization: this.plugin.settings.token },
+            name: name
+        })).data
+        return data
     }
 
     async login(email: string, password: string) {
@@ -38,11 +41,7 @@ export class Account {
 
         const user = await this.GetData();
         this.plugin.logger.info("Используем аккаунт "+user.email)
-        this.data = {
-            email: user.email,
-            subscription: user.sub,
-            space: user.space
-        }
+        this.data = user;
     }
 
     async GetData() {
@@ -57,6 +56,12 @@ export interface IAccountData {
     email: string;
     subscription: string;
     space: string;
+    vaults: IVault[];
+}
+
+export interface IVault {
+    id: number;
+    name: string;
 }
 
 export interface IDevice {

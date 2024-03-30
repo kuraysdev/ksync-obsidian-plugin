@@ -9,7 +9,7 @@ export class API {
         this.plugin = plugin;
         this.axios = axios.create({
             baseURL: url,
-            timeout: 1000,
+            timeout: 10000,
             headers: {'Content-Type': 'application/json'}
         });
         this.status = true;

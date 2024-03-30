@@ -1,18 +1,38 @@
+import axios from "axios";
 import { TAbstractFile, TFolder, Vault } from "obsidian"
-import * as path from "path";
-import * as fs from "fs/promises";
 import KSyncPlugin from "src/main";
-import { time } from "console";
 import { hash } from "src/util/FileUtil";
 
 export class VaultService {
-    public tempBasePath = '.ksync'
-    public vault: Vault
+    public tempBasePath = '.ksync';
+    public vault: Vault;
+    public plugin: KSyncPlugin;
 
     constructor(plugin: KSyncPlugin) {
         this.vault = plugin.app.vault;
-        
+        this.plugin = plugin;
         this.checkTemp();
+    }
+
+    async sync() {
+        const metadata = await this.getMetadata();
+        const id = this.plugin.settings.vaultid;
+        const data = (await this.plugin.api.axios.post(`/vault/${id}/sync`, {
+            headers: { Authorization: this.plugin.settings.token },
+            metadata
+        })).data
+
+        console.log(data)
+
+        data.toDownload.forEach((file: any) => {
+            this.Download(file.path, file.link);
+        })
+
+        data.toUpload.forEach((file: any) => {
+            this.Upload(file.path, file.link);
+        })
+
+        return 0
     }
 
     private async checkTemp() {
@@ -53,6 +73,23 @@ export class VaultService {
     onDelete(file: TAbstractFile) {
         console.log("File deleted");
         this.vault.adapter.copy(file.path, this.tempBasePath + file.path);
+    }
+
+    async Upload(path: string, link: string) {
+        const file = await this.vault.adapter.readBinary(path)
+        const data = (await axios.put(link, file)).data
+        console.log(data);
+        return data
+    }
+
+    async Download(path: string, link: string) {
+        const data = (await axios.get(link, {responseType: "blob"})).data;
+        const blob = new Blob([data])
+        const buffer = await blob.arrayBuffer();
+        this.vault.adapter.writeBinary(path, buffer, {
+            
+        });
+        return 1
     }
 
 }
