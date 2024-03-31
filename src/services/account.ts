@@ -1,4 +1,5 @@
 import KSyncPlugin from "src/main";
+import { WarningModal } from "src/modals/warning";
 
 export class Account {
     public plugin: KSyncPlugin;
@@ -36,11 +37,13 @@ export class Account {
             login: email, 
             password: password
         })).data
+        if(!data) return new WarningModal(this.plugin.app, this.plugin, "Сервер не ответил").open();
+        if(data.error) return new WarningModal(this.plugin.app, this.plugin, "Неправильный Логин или пароль").open();
         this.plugin.settings.token = data.token
         this.plugin.saveSettings()
 
         const user = await this.GetData();
-        this.plugin.logger.info("Используем аккаунт "+user.email)
+        this.plugin.logger.info(`Входим в аккаунт ${user.email}`)
         this.data = user;
     }
 

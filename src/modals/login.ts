@@ -1,5 +1,6 @@
-import { App, ButtonComponent, Modal, Setting } from "obsidian";
+import { App, ButtonComponent, Modal, Setting, setIcon, setTooltip } from "obsidian";
 import KSyncPlugin from "src/main";
+import { WarningModal } from "./warning";
 
 export class LoginModal extends Modal {
 	private login: string;

@@ -15,6 +15,21 @@ If your plugin does not need CSS, delete this file.
     border-radius: var(--input-radius);
 }
 
+.warning {
+    width: 100%;
+    height: fit-content;
+    border: var(--input-border-width) solid var(--background-modifier-border);
+    border-radius: var(--input-radius);
+    background-color: var(--color-red);
+    padding: 5px;
+    margin-bottom: 5px;
+}
+
+.warning .text {
+    margin: 15px;
+    font-size: var(--font-ui-large);
+}
+
 .log-list {
     list-style-type: none;
     padding: 5px;
