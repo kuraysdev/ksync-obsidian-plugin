@@ -28,7 +28,7 @@ export class VaultsModal extends Modal {
 				this.plugin.settings.vaultid = id;
 				this.plugin.saveSettings();
 			}).setDisabled(this.plugin.settings.vaultid === vault.id))
-			.addButton(button => button.setButtonText("rm -rf /*").setWarning())
+			.addButton(button => button.setButtonText("Удалить").setWarning())
         })
 
 		new ButtonComponent(contentEl).setButtonText("Создать новое хранилище").onClick(async (_) => {
