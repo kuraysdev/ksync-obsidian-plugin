@@ -31,7 +31,7 @@ export class SampleSettingTab extends PluginSettingTab {
 
 		if(!this.plugin.api.status) {
 			new Setting(container)
-			.setName("Невозможно подключиться к серверу!")
+			.setName("Сервер недоступен, пожалуйста, повторите попытку.")
 			.addButton(button => button
 				.setButtonText("Переподключиться")
 				.onClick(async (_) => {
@@ -42,17 +42,17 @@ export class SampleSettingTab extends PluginSettingTab {
 
 		new Setting(container)
 			.setHeading()
-			.setName("Аккаунт");
+			.setName("Взаимодействие с аккаунтом и хранилищем");
 
 		//Проверка есть ли аккаунт и доступно ли API
 		if(this.plugin.settings.token === "" || !this.plugin.api.status) {
 			new Setting(container)
-			.setName(`Вы не вошли в аккаунт`)
+			.setName(`Вы ещё не зашли в собственный аккаунт.`)
 			.addButton(button => button
 				.setButtonText("Войти")
 				.onClick(async (_) => {
 					new LoginModal(this.app, this.plugin).open()
-					this.logger.info("Используем официальный сервер")
+					this.logger.info("Используем официальный сервер.")
 				})
 			)
 		} else {
@@ -80,17 +80,19 @@ export class SampleSettingTab extends PluginSettingTab {
 
 			// 	})
 			// )
+
 			new Setting(container)
 				.setName(`Хранилища (Выбрано: ${this.user.data.vaults.find(vault => vault.id === this.plugin.settings.vaultid)?.name})`)
-				.setDesc("Выберите используемое хранилище")
+				.setDesc("Создайте или выберите используемое хранилище для синхронизации")
 				.addButton(button => button
 					.setButtonText("Просмотреть")
 					.onClick(async () => {
 						new VaultsModal(this.app, this.plugin).open()
 					})
 				)
-
-			new Setting(container)
+			
+				// TODO: Добавить в бета-тестирование только после того как будет реализован API
+			/** new Setting(container)
 				.setName("Устройства")
 				.setDesc("Устройства привязанные к аккаунту")
 				.addButton(button => button
@@ -99,21 +101,17 @@ export class SampleSettingTab extends PluginSettingTab {
 						new DevicesModal(this.app, this.plugin).open()
 					})
 				)
-			const all = Number(this.user.data.space)
-			const used = await this.plugin.manager.getSize()
-			new Setting(container)
-				.setHeading()
-				.setName(`Использование: ${humanFileSize(used)}/${humanFileSize(all)}`);
-
-			const progressBarContainer = container.createEl("div", {cls: "space-progress-bar",});
-			const progressBar = progressBarContainer.createEl("div", {cls: ""}).setCssStyles({width: `${used/all*100}%`});
+			*/
 		}
 		
-		
+		new Setting(container)
+			.setHeading()
+			.setName("Взаимодействие с сервером");
+
 		if(this.plugin.settings.vaultid !== 0) {
 			new Setting(container)
 			.setName("Запустить KSync")
-			.setDesc("Запуск процесса синхронизации")
+			.setDesc("Запустить процесс синхронизации между клиентом и сервером")
 			.addButton(button => button
 				.setButtonText("Запуск")
 				.setDisabled(true)
@@ -124,10 +122,9 @@ export class SampleSettingTab extends PluginSettingTab {
 			);
 		}
 		
-
 		new Setting(container)
 			.setName("Адрес сервера KSync")
-			.setDesc("Укажите нужный вам адрес сервера")
+			.setDesc("Укажите необходимый адрес сервера для синхронизации")
 			.addText(text => text
 				.setPlaceholder("ksync.kurays.dev")
 				.setValue(this.plugin.settings.server)
@@ -142,12 +139,12 @@ export class SampleSettingTab extends PluginSettingTab {
 
 		new Setting(container)
 			.setHeading()
-			.setName("Логи");
+			.setName("Debug-режим");
 
 		this.loggerWindow = new LogWindow(container, this.logger);
 		
 		new Setting(container)
 		.setHeading()
-		.setName("© KSync 2024 | Разработчик Абрамов Егор")
+		.setName("© KSync 2024 | Разработчик: Абрамов Егор")
 	}
 }

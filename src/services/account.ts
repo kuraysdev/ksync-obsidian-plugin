@@ -36,8 +36,8 @@ export class Account {
             login: email, 
             password: password
         })).data
-        if(!data) return new WarningModal(this.plugin.app, this.plugin, "Сервер не ответил").open();
-        if(data.error) return new WarningModal(this.plugin.app, this.plugin, "Неправильный Логин или пароль").open();
+        if(!data) return new WarningModal(this.plugin.app, this.plugin, "Сервер не отвечает. Попробуйте позднее.").open();
+        if(data.error) return new WarningModal(this.plugin.app, this.plugin, "Вы ввели неправильный логин или пароль. Пожалуйста, проверьте введенные данные на их правильность и попробуйте заново.").open();
         this.plugin.settings.token = data.token
         this.plugin.saveSettings()
 
