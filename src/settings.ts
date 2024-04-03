@@ -8,6 +8,7 @@ import { Logger } from "./util/Logger";
 import { DevicesModal } from "./modals/devices";
 import { Account } from "./services/account";
 import { VaultsModal } from "./modals/vaults";
+import { humanFileSize } from "./util/FileUtil";
 
 export class SampleSettingTab extends PluginSettingTab {
 	plugin: KSyncPlugin;
@@ -98,13 +99,14 @@ export class SampleSettingTab extends PluginSettingTab {
 						new DevicesModal(this.app, this.plugin).open()
 					})
 				)
-
+			const all = Number(this.user.data.space)
+			const used = await this.plugin.manager.getSize()
 			new Setting(container)
 				.setHeading()
-				.setName(`Использование: 5/${this.user.data.space}`);
+				.setName(`Использование: ${humanFileSize(used)}/${humanFileSize(all)}`);
 
 			const progressBarContainer = container.createEl("div", {cls: "space-progress-bar",});
-			const progressBar = progressBarContainer.createEl("div", {cls: ""}).setCssStyles({width: `10%`});
+			const progressBar = progressBarContainer.createEl("div", {cls: ""}).setCssStyles({width: `${used/all*100}%`});
 		}
 		
 		

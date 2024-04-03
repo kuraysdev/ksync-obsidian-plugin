@@ -17,15 +17,14 @@ export class VaultService {
     async sync() {
         const metadata = await this.getMetadata();
         const id = this.plugin.settings.vaultid;
-        const data = (await this.plugin.api.axios.post(`/vault/${id}/sync`, {
+        const data = (await this.plugin.api.axios.post(`/vault/${id}/sync`,{ metadata }, {
             headers: { Authorization: this.plugin.settings.token },
-            metadata
         })).data
 
         console.log(data)
 
         data.toDownload.forEach((file: any) => {
-            this.Download(file.path, file.link);
+            this.Download(file.path, file.link, file.ctime, file.mtime);
         })
 
         data.toUpload.forEach((file: any) => {
@@ -69,6 +68,11 @@ export class VaultService {
         this.vault.adapter.write(this.tempBasePath+'/metadata.json', JSON.stringify(files))
     }
 
+    async getSize() {
+        const files = await this.plugin.manager.getMetadata();
+        return files.reduce((accumulator, currentFile) => {return accumulator + currentFile.size}, 0);
+    }
+
 
     onDelete(file: TAbstractFile) {
         console.log("File deleted");
@@ -82,14 +86,35 @@ export class VaultService {
         return data
     }
 
-    async Download(path: string, link: string) {
+    async Download(path: string, link: string, ctime: number, mtime: number) {
         const data = (await axios.get(link, {responseType: "blob"})).data;
+        ctime = Number(ctime);
+        mtime = Number(mtime);
         const blob = new Blob([data])
         const buffer = await blob.arrayBuffer();
-        this.vault.adapter.writeBinary(path, buffer, {
-            
-        });
+        if(this.vault.getAbstractFileByPath(path)) {
+            this.vault.adapter.writeBinary(path, buffer, {ctime, mtime})
+        } else {
+            this.checkFolder(path);
+            this.vault.createBinary(path, buffer, {
+                ctime, mtime
+            });
+        }
+        
         return 1
+    }
+
+    async checkFolder(path: string) {
+        const elements = path.split("/");
+        elements.pop();
+        let dir = "";
+        for (const folder of elements) {
+            dir += folder;
+            try {
+                await this.vault.adapter.mkdir(dir);
+            } catch (ex: any) {}
+            dir += "/";
+        }
     }
 
 }

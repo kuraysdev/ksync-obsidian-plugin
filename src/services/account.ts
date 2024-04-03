@@ -25,9 +25,8 @@ export class Account {
     }
 
     async createVault(name: string) {
-        const data = (await this.plugin.api.axios.post("/vault/create", {
+        const data = (await this.plugin.api.axios.post("/vault/create", {name: name}, {
             headers: { Authorization: this.plugin.settings.token },
-            name: name
         })).data
         return data
     }
