@@ -18,12 +18,12 @@ export class VaultsModal extends Modal {
 
 		new Setting(contentEl)
 			.setHeading()
-			.setName("Хранилища");
+			.setName("Ваши хранилища");
 
 		this.plugin.account.data.vaults.forEach(async (vault) => {
             new Setting(contentEl)
             .setName(vault.name)
-            .addButton(button => button.setButtonText("Установить").onClick(async (_) => {
+            .addButton(button => button.setButtonText("Подключить").onClick(async (_) => {
 				const id = vault.id;
 				this.plugin.settings.vaultid = id;
 				this.plugin.saveSettings();
@@ -31,7 +31,7 @@ export class VaultsModal extends Modal {
 			.addButton(button => button.setButtonText("Удалить").setWarning())
         })
 
-		new ButtonComponent(contentEl).setButtonText("Создать хранилище").onClick(async (_) => {
+		new ButtonComponent(contentEl).setButtonText("Создать новое хранилище").onClick(async (_) => {
 			new CreateVaultModal(this.app, this, this.plugin).open()
 		})
 	}
@@ -63,7 +63,7 @@ class CreateVaultModal extends Modal {
 		new Setting(contentEl)
 			.setName("Название хранилища")
 			.addText(text => text
-				.setPlaceholder("МоёХранилище")
+				.setPlaceholder("Моё первое хранилище!")
 				.setValue(this.vault)
 			 	.onChange(async (value) => {
 			 		this.vault = value;

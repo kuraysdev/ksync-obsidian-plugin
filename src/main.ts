@@ -18,8 +18,8 @@ interface KSyncSettings {
 const DEFAULT_SETTINGS: KSyncSettings = {
 	token: "",
 	vaultid: 0,
-	server: "http://localhost:8000",
-	encryption: false
+	server: "https://sync.kurays.dev",
+	encryption: true
 }
 
 export default class KSyncPlugin extends Plugin {

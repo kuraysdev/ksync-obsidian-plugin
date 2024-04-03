@@ -20,7 +20,7 @@ export class LoginModal extends Modal {
 
 		new Setting(contentEl)
 			.setHeading()
-			.setName("Вход в ваш аккаунт");
+			.setName("Авторизация");
 
 		new Setting(contentEl)
 			.setName("Логин")
@@ -35,7 +35,7 @@ export class LoginModal extends Modal {
 		new Setting(contentEl)
 			.setName("Пароль")
 			.addText(text => text
-				.setPlaceholder("Sussy password")
+				.setPlaceholder("Password")
 				.setValue(this.password)
 			 	.onChange(async (value) => {
 			 		this.password = value;

@@ -1,6 +1,6 @@
 {
 	"name": "ksync",
-	"version": "0.0.1",
+	"version": "0.0.3",
 	"description": "Synchronization plugin for Obsidian (https://obsidian.md)",
 	"main": "main.js",
 	"scripts": {

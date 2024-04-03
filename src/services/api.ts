@@ -21,10 +21,10 @@ export class API {
         });;
         if(!data) { 
             this.status = false;
-            this.plugin.logger.fatal("Сервер не отвечает!");
+            this.plugin.logger.fatal("Отсутствует подключение к серверу. Пожалуйста, проверьте введенный адрес KSync и попробуйте заново.");
         } else {
             this.status = true;
-            this.plugin.logger.info("Сервер онлайн!");
+            this.plugin.logger.info("Подключение к серверу произведено успешно!");
         }
 
     }
