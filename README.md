@@ -4,6 +4,8 @@
 
 The world's first self-hosted sync plugin for Obsidian.
 
+ENG | [RU](https://github.com/kuraysdev/ksync-obsidian-plugin/blob/master/README_ru.md)
+
 ## Available functionality
 
 - Authorization system
