@@ -14,7 +14,7 @@ The world's first self-hosted sync plugin for Obsidian.
 
 ## TODO
 
-[] Device management
-[] Automatic synchronization at a set time or after saving files
-[] Support for displaying the available amount of memory in the cloud
-[] Localization into other languages (not only Russian and English)
+[ ] Device management
+[ ] Automatic synchronization at a set time or after saving files
+[ ] Support for displaying the available amount of memory in the cloud
+[ ] Localization into other languages (not only Russian and English)
