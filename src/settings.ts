@@ -102,6 +102,15 @@ export class SampleSettingTab extends PluginSettingTab {
 					})
 				)
 			*/
+
+			const all = Number(this.user.data.space)
+			const used = await this.plugin.manager.getSize()
+			new Setting(container)
+				.setHeading()
+				.setName(`Использование: ${humanFileSize(used)}/${humanFileSize(all)}`);
+
+			const progressBarContainer = container.createEl("div", {cls: "space-progress-bar",});
+			progressBarContainer.createEl("div", {cls: ""}).setCssStyles({width: `${used/all*100}%`});
 		}
 		
 		new Setting(container)

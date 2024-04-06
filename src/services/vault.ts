@@ -1,5 +1,5 @@
 import axios from "axios";
-import { TAbstractFile, TFolder, Vault } from "obsidian"
+import { Notice, TAbstractFile, TFolder, Vault } from "obsidian"
 import KSyncPlugin from "src/main";
 import { hash } from "src/util/FileUtil";
 
@@ -15,6 +15,7 @@ export class VaultService {
     }
 
     async sync() {
+        new Notice("Синхронизация...")
         const metadata = await this.getMetadata();
         const id = this.plugin.settings.vaultid;
         const data = (await this.plugin.api.axios.post(`/vault/${id}/sync`,{ metadata }, {
@@ -31,7 +32,7 @@ export class VaultService {
             this.Upload(file.path, file.link);
         })
 
-        return 0
+        return new Notice(`Синхронизировано ${data.toDownload.length + data.toUpload.length} файлов`)
     }
 
     private async checkTemp() {
@@ -45,15 +46,16 @@ export class VaultService {
         console.log("Temp Folder Exists!");
     }
 
-    async getMetadata() {
+    async getMetadata(withHash: boolean = true) {
         const snapshot = Array<IFile>();
         const files = this.vault.getFiles();
         for (const file of files) {
-            let hashed = await hash(await this.vault.read(file))
+            let filehash = "";
+            if(withHash) filehash = await hash(await this.vault.readBinary(file))
             snapshot.push({
                 path: file.path,
                 size: file.stat.size,
-                hash: hashed,
+                hash: filehash,
                 ctime: file.stat.ctime,
                 mtime: file.stat.mtime,
                 deleted: false
@@ -69,7 +71,7 @@ export class VaultService {
     }
 
     async getSize() {
-        const files = await this.plugin.manager.getMetadata();
+        const files = await this.plugin.manager.getMetadata(false);
         return files.reduce((accumulator, currentFile) => {return accumulator + currentFile.size}, 0);
     }
 
