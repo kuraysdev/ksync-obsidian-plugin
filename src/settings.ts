@@ -9,6 +9,7 @@ import { DevicesModal } from "./modals/devices";
 import { Account } from "./services/account";
 import { VaultsModal } from "./modals/vaults";
 import { humanFileSize } from "./util/FileUtil";
+import { CryptoModal } from "./modals/crypto";
 
 export class SampleSettingTab extends PluginSettingTab {
 	plugin: KSyncPlugin;
@@ -91,6 +92,16 @@ export class SampleSettingTab extends PluginSettingTab {
 					})
 				)
 			
+
+			new Setting(container)
+				.setName(`Шифрование`)
+				.setDesc(`Настройки безопастности для вашего хранилища`)
+				.addButton(button => button
+				.setButtonText("Просмотреть")
+				.onClick(async () => {
+					new CryptoModal(this.app, this.plugin).open()
+				})
+			)
 				// TODO: Добавить в бета-тестирование только после того как будет реализован API
 			/** new Setting(container)
 				.setName("Устройства")
@@ -117,7 +128,7 @@ export class SampleSettingTab extends PluginSettingTab {
 			.setHeading()
 			.setName("Взаимодействие с сервером");
 
-		if(this.plugin.settings.vaultid !== 0) {
+		if(this.plugin.settings.vaultid !== "") {
 			new Setting(container)
 			.setName("Запустить KSync")
 			.setDesc("Запустить процесс синхронизации между клиентом и сервером")

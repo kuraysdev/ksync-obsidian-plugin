@@ -9,17 +9,18 @@ import { Account } from "./services/account";
 import { VaultService } from "./services/vault";
 interface KSyncSettings {
 	token: string;
-	vaultid: number;
+	vaultid: string;
 
 	server: string;
 	encryption: boolean;
+	key?: string;
 }
 
 const DEFAULT_SETTINGS: KSyncSettings = {
 	token: "",
-	vaultid: 0,
+	vaultid: "",
 	server: "https://sync.kurays.dev",
-	encryption: true
+	encryption: true,
 }
 
 export default class KSyncPlugin extends Plugin {

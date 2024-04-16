@@ -36,20 +36,16 @@ export class Account {
             login: email, 
             password: password
         })).data
-        if(!data) return new WarningModal(this.plugin.app, this.plugin, "Сервер не отвечает. Попробуйте позднее.").open();
-        if(data.error) return new WarningModal(this.plugin.app, this.plugin, "Вы ввели неправильный логин или пароль. Пожалуйста, проверьте введенные данные на их правильность и попробуйте заново.").open();
-        this.plugin.settings.token = data.token
-        this.plugin.saveSettings()
-
-        const user = await this.GetData();
-        this.plugin.logger.info(`Входим в аккаунт ${user.email}`)
-        this.data = user;
+        await this.GetData();
+        
+        return data
     }
 
     async GetData() {
         const data = (await this.plugin.api.axios.get("/user", {
             headers: { Authorization: this.plugin.settings.token }
         })).data
+        this.data = data;
         return data
     }
 }
@@ -62,7 +58,7 @@ export interface IAccountData {
 }
 
 export interface IVault {
-    id: number;
+    id: string;
     name: string;
 }
 

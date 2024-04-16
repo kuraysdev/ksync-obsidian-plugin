@@ -1,6 +1,7 @@
 import { App, ButtonComponent, Modal, Setting } from "obsidian";
 import KSyncPlugin from "src/main";
 import { IDevice } from "src/services/account";
+import { RetypePasswordModal } from "./crypto";
 
 export class VaultsModal extends Modal {
 	private login: string;
@@ -25,8 +26,8 @@ export class VaultsModal extends Modal {
             .setName(vault.name)
             .addButton(button => button.setButtonText("Подключить").onClick(async (_) => {
 				const id = vault.id;
-				this.plugin.settings.vaultid = id;
-				this.plugin.saveSettings();
+				new RetypePasswordModal(this.app, this.plugin, id).open();
+				this.close();
 			}).setDisabled(this.plugin.settings.vaultid === vault.id))
 			.addButton(button => button.setButtonText("Удалить").setWarning())
         })
