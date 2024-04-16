@@ -38,7 +38,7 @@ export async function generateKey(password: string, vaultId: string): Promise<Ar
       false,
       ['deriveBits', 'deriveKey']
   );
-  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const salt = encoder.encode(vaultId);
   const key = await crypto.subtle.deriveKey(
       {
           name: 'PBKDF2',
@@ -72,22 +72,25 @@ export async function encrypt(data: ArrayBuffer, key: Buffer): Promise<ArrayBuff
 }
 
 export async function decrypt(encryptedData: ArrayBuffer, key: Buffer): Promise<ArrayBuffer> {
-    try {
-      const data = new Uint8Array(encryptedData);
-      const iv = data.subarray(0,12);
-      let encrypted = data.subarray(12)
+  const data = new Uint8Array(encryptedData);
+  const iv = data.subarray(0,12);
+  let encrypted = data.subarray(12, data.byteLength);
 
-      const keyObj = await crypto.subtle.importKey(
-        'raw',
-        key,
-        { name: 'AES-GCM' },
-        false,
-        ['decrypt']
-      );
+  console.log(data);
+  console.log(iv);
+  console.log(encrypted);
 
-      const decryptedData = await crypto.subtle.decrypt({name: 'AES-GCM', iv: iv}, keyObj, encrypted);
-      return decryptedData;
-    } catch(e) {
-      return e;
-    }
+  const keyObj = await crypto.subtle.importKey(
+    'raw',
+    key,
+    { name: 'AES-GCM' },
+    false,
+    ['decrypt']
+  );
+
+  console.log(keyObj);
+
+  const decryptedData = await crypto.subtle.decrypt({name: 'AES-GCM', iv: iv}, keyObj, encrypted);
+  console.log(decryptedData);
+  return decryptedData;
 }
