@@ -69,8 +69,7 @@ export class RetypePasswordModal extends Modal {
             const key = await generateKey(this.password, this.vaultId);
             if(!key) return new WarningModal(this.plugin.app, this.plugin, "Произошла ошибка при создании ключа.").open()
 
-            const decoder = new TextDecoder()
-            this.plugin.settings.key = decoder.decode(key);
+            this.plugin.settings.key = Buffer.from(key).toString('base64');
             this.plugin.saveSettings();
             this.plugin.settings.vaultid = this.vaultId;
 			this.plugin.saveSettings();

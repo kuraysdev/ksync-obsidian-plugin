@@ -44,7 +44,7 @@ export async function generateKey(password: string, vaultId: string): Promise<Ar
           name: 'PBKDF2',
           salt: salt,
           iterations: 100000,
-          hash: 'SHA-512'
+          hash: 'SHA-256'
       },
       keyMaterial,
       { name: 'AES-GCM', length: 256 },

@@ -19,7 +19,7 @@ export class VaultService {
         new Notice("Синхронизация...")
         const metadata = await this.getMetadata();
         const id = this.plugin.settings.vaultid;
-        const key = Buffer.from(this.plugin.settings.key as string);
+        const key = Buffer.from(this.plugin.settings.key as string, 'base64');
         const data = (await this.plugin.api.axios.post(`/vault/${id}/sync`,{ metadata }, {
             headers: { Authorization: this.plugin.settings.token },
         })).data
@@ -87,7 +87,7 @@ export class VaultService {
         const file = await this.vault.adapter.readBinary(path)
         
         const encrypted = await encrypt(file, key);
-
+        if(!encrypted) return this.plugin.logger.fatal(`Не удалось зашифровать файл ${path}`);
         const data = (await axios.put(link, encrypted)).data
         console.log(data);
         return data
