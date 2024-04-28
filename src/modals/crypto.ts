@@ -1,7 +1,7 @@
 import { App, ButtonComponent, Component, MarkdownRenderer, Modal, Setting } from "obsidian";
 import KSyncPlugin from "src/main";
 import { WarningModal } from "./warning";
-import { generateKey } from "../util/FileUtil";
+import { ArrayBuffer2String, generateKey } from "../util/CryptoHelper";
 
 export class CryptoModal extends Modal {
     public plugin: KSyncPlugin;
@@ -18,7 +18,7 @@ export class CryptoModal extends Modal {
 			.setName("Настройки шифрования");
         new Setting(contentEl)
         .setName("Это ваш ключ. Красивый, правда?")
-        .setDesc(this.plugin.settings.key ?? "Отсутствует")
+        .setDesc(String(this.plugin.settings.key) ?? "Отсутствует")
 	}
 
 	onClose() {
@@ -69,7 +69,7 @@ export class RetypePasswordModal extends Modal {
             const key = await generateKey(this.password, this.vaultId);
             if(!key) return new WarningModal(this.plugin.app, this.plugin, "Произошла ошибка при создании ключа.").open()
 
-            this.plugin.settings.key = Buffer.from(key).toString('base64');
+            this.plugin.settings.key = key;
             this.plugin.saveSettings();
             this.plugin.settings.vaultid = this.vaultId;
 			this.plugin.saveSettings();

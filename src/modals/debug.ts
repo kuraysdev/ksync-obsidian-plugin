@@ -1,6 +1,7 @@
 import { Modal, App, MarkdownRenderer, Component } from "obsidian";
 import KSyncPlugin from "src/main";
-import { hash, humanFileSize } from "src/util/FileUtil";
+import { humanFileSize } from "src/util/FileUtil";
+import { hash } from "src/util/CryptoHelper";
 
 export class SampleModal extends Modal {
 	public plugin: KSyncPlugin;

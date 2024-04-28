@@ -1,7 +1,8 @@
 import axios from "axios";
 import { Notice, TAbstractFile, TFolder, Vault } from "obsidian"
 import KSyncPlugin from "src/main";
-import { decrypt, encrypt, hash } from "src/util/FileUtil";
+import { String2ArrayBuffer, decrypt, encrypt, hash } from "src/util/CryptoHelper";
+import { FileMeta } from "src/util/FileUtil";
 
 export class VaultService {
     public tempBasePath = '.ksync';
@@ -19,7 +20,7 @@ export class VaultService {
         new Notice("Синхронизация...")
         const metadata = await this.getMetadata();
         const id = this.plugin.settings.vaultid;
-        const key = Buffer.from(this.plugin.settings.key as string, 'base64');
+        const key = this.plugin.settings.key;
         const data = (await this.plugin.api.axios.post(`/vault/${id}/sync`,{ metadata }, {
             headers: { Authorization: this.plugin.settings.token },
         })).data
@@ -27,7 +28,11 @@ export class VaultService {
         console.log(data)
 
         data.toDownload.forEach((file: any) => {
-            this.Download(file.path, key, file.link, file.ctime, file.mtime);
+            const meta = {
+                ctime: Number(file.ctime),
+                mtime: Number(file.mtime)
+            }
+            this.Download(file.path, file.link, meta, key);
         })
 
         data.toUpload.forEach((file: any) => {
@@ -83,36 +88,46 @@ export class VaultService {
         this.vault.adapter.copy(file.path, this.tempBasePath + file.path);
     }
 
-    async Upload(path: string, link: string, key: Buffer) {
+    async Upload(path: string, link: string, key?: JsonWebKey) {
         const file = await this.vault.adapter.readBinary(path)
+
+        //Check if key exists
+        if(!key) {
+            const data = (await axios.put(link, file)).data
+            console.log(data);
+            return data
+        } else {
+            const encrypted = await encrypt(file, key);
+            if(!encrypted) return this.plugin.logger.fatal(`Не удалось зашифровать файл ${path}`);
+            const data = (await axios.put(link, encrypted)).data
+            console.log(data);
+            return data
+        }
         
-        const encrypted = await encrypt(file, key);
-        if(!encrypted) return this.plugin.logger.fatal(`Не удалось зашифровать файл ${path}`);
-        const data = (await axios.put(link, encrypted)).data
-        console.log(data);
-        return data
     }
 
-    async Download(path: string, key: Buffer, link: string, ctime: number, mtime: number) {
+    async Download(path: string, link: string, meta: FileMeta, key?: JsonWebKey) {
         const data = (await axios.get(link, {responseType: "blob"})).data;
-        ctime = Number(ctime);
-        mtime = Number(mtime);
         const blob = new Blob([data])
         const buffer = await blob.arrayBuffer();
-
-        const decrypted = await decrypt(buffer, key);
-        if(!decrypted) return this.plugin.logger.fatal(`Не удалось дешифровать файл ${path}`);
-
-        if(this.vault.getAbstractFileByPath(path)) {
-            this.vault.adapter.writeBinary(path, decrypted, {ctime, mtime})
+        if(!key) {
+            this.putFile(path, buffer, meta);
         } else {
-            this.checkFolder(path);
-            this.vault.createBinary(path, decrypted, {
-                ctime, mtime
-            });
+            const decrypted = await decrypt(buffer, key);
+            if(!decrypted) return this.plugin.logger.fatal(`Не удалось дешифровать файл ${path}`);
+            this.putFile(path, decrypted, meta);
         }
         
         return 1
+    }
+
+    async putFile(path: string, file: ArrayBuffer, meta: FileMeta) {
+        if(this.vault.getAbstractFileByPath(path)) {
+            this.vault.adapter.writeBinary(path, file, meta)
+        } else {
+            this.checkFolder(path);
+            this.vault.createBinary(path, file, meta);
+        }
     }
 
     async checkFolder(path: string) {

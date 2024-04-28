@@ -1,6 +1,5 @@
-import { App, Component, MarkdownRenderer, Modal, moment, Plugin, TFile, TFolder, Vault } from "obsidian";
+import { moment, Plugin } from "obsidian";
 import { SampleSettingTab as KSyncSettingTab } from "./settings";
-import { hash } from "./util/FileUtil";
 import { LoginModal } from "./modals/login";
 import { SampleModal } from "./modals/debug";
 import { API } from "./services/api";
@@ -13,7 +12,7 @@ interface KSyncSettings {
 
 	server: string;
 	encryption: boolean;
-	key?: string;
+	key?: JsonWebKey;
 }
 
 const DEFAULT_SETTINGS: KSyncSettings = {
