@@ -6,6 +6,8 @@ import { API } from "./services/api";
 import { Logger } from "./util/Logger";
 import { Account } from "./services/account";
 import { VaultService } from "./services/vault";
+import { LocaleManager } from "./services/locale";
+import { FileManagerModal } from "./modals/filemanager";
 interface KSyncSettings {
 	token: string;
 	vaultid: string;
@@ -31,12 +33,15 @@ export default class KSyncPlugin extends Plugin {
 	api: API;
 	account: Account;
 	manager: VaultService;
+	langs: LocaleManager;
 
 	async onload() {
 		this.logger = new Logger();
 		await this.loadSettings();
 		this.registerEvents();
+		this.langs = new LocaleManager();
 
+		this.langs.registerLocales();
 		this.api = new API(this, this.settings.server);
 		this.account = new Account(this);
 		this.manager =  new VaultService(this);
@@ -47,7 +52,7 @@ export default class KSyncPlugin extends Plugin {
 			await this.account.getUser();
 		}
 		this.settingsTab = new KSyncSettingTab(this.app, this)
-		this.addRibbonIcon("cloud", "KSync", (evt: MouseEvent) => new SampleModal(this.app, this).open());
+		this.addRibbonIcon("cloud", "KSync", (evt: MouseEvent) => new FileManagerModal(this.app, this).open());
 		this.addSettingTab(this.settingsTab);
 		this.addCommand({
 			id: "sync",
@@ -95,7 +100,10 @@ export default class KSyncPlugin extends Plugin {
 		// this.registerEvent(this.app.vault.on("rename", ({ path }, oldPath) => this.socket?.send({ opcode: FrameOPCode.Rename, data: { oldPath, path } })));
 	}
 
-	onunload() { }
+	async onunload() {
+		//TODO(kurays): It works on closing app?
+		await this.manager.SaveToFile()
+	}
 
 	loadSettings = async () => this.settings = { ...DEFAULT_SETTINGS, ...await this.loadData() };
 

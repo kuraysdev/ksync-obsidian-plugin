@@ -1,7 +1,7 @@
 import { App, ButtonComponent, Component, MarkdownRenderer, Modal, Setting } from "obsidian";
 import KSyncPlugin from "src/main";
 import { WarningModal } from "./warning";
-import { ArrayBuffer2String, generateKey } from "../util/CryptoHelper";
+import { generateKey } from "../util/CryptoHelper";
 
 export class CryptoModal extends Modal {
     public plugin: KSyncPlugin;

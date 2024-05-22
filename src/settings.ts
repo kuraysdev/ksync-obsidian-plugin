@@ -46,7 +46,7 @@ export class SampleSettingTab extends PluginSettingTab {
 			.setName("Взаимодействие с аккаунтом и хранилищем");
 
 		//Проверка есть ли аккаунт и доступно ли API
-		if(this.plugin.settings.token === "" || !this.plugin.api.status) {
+		if(this.plugin.settings.token === "" || !this.plugin.api.status || !this.user) {
 			new Setting(container)
 			.setName(`Вы ещё не зашли в собственный аккаунт.`)
 			.addButton(button => button

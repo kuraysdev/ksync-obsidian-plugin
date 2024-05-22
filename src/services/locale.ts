@@ -7,7 +7,8 @@ export class LocaleManager {
     }
 
     async registerLocales() {
-        
+        const ru = require('../locales/ru.json');
+        console.log(ru);
     }
 
     getLocale() {}

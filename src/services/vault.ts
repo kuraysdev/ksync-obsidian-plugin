@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Notice, TAbstractFile, TFolder, Vault } from "obsidian"
 import KSyncPlugin from "src/main";
-import { String2ArrayBuffer, decrypt, encrypt, hash } from "src/util/CryptoHelper";
+import { decrypt, encrypt, hash } from "src/util/CryptoHelper";
 import { FileMeta } from "src/util/FileUtil";
 
 export class VaultService {

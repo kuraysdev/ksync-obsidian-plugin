@@ -72,17 +72,3 @@ export async function decrypt(encryptedData: ArrayBuffer, key: JsonWebKey): Prom
     console.log(decryptedData);
     return decryptedData;
 }
-  
-
-export function ArrayBuffer2String(data: ArrayBuffer): string {
-    const arrayBuffer = new Uint8Array(data).buffer;
-    const textDecoder = new TextDecoder('utf-8');
-    const string = textDecoder.decode(arrayBuffer);
-    return string
-}
-
-export function String2ArrayBuffer(data: string): ArrayBuffer {
-    const textEncoder = new TextEncoder();
-    const arrayBuffer = textEncoder.encode(data).buffer;
-    return arrayBuffer
-}

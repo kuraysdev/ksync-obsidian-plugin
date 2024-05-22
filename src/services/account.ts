@@ -31,6 +31,13 @@ export class Account {
         return data
     }
 
+    async getVault(id: string) {
+        const data = (await this.plugin.api.axios.get("/vault/"+id, {
+            headers: { Authorization: this.plugin.settings.token },
+        })).data
+        return data
+    }
+
     async login(email: string, password: string) {
         const data = (await this.plugin.api.axios.post("/user/login", {
             login: email, 
