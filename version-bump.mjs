@@ -4,7 +4,7 @@ const targetVersion = process.env.version;
 
 let file = JSON.parse(readFileSync("package.json", "utf8"));
 file.version = targetVersion;
-writeFileSync("package.json", JSON.stringify(manifest, null, "\t"));
+writeFileSync("package.json", JSON.stringify(file, null, "\t"));
 
 // read minAppVersion from manifest.json and bump version to target version
 let manifest = JSON.parse(readFileSync("manifest.json", "utf8"));
