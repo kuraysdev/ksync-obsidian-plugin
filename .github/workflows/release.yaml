@@ -20,7 +20,7 @@ jobs:
       
       - name: Bump version
         run: yarn run version
-        with:
+        env:
          version: ${{  github.ref_name }}
       
       - name: Build project
