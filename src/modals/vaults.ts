@@ -1,6 +1,5 @@
 import { App, ButtonComponent, Modal, Setting } from "obsidian";
 import KSyncPlugin from "src/main";
-import { IDevice } from "src/services/account";
 import { RetypePasswordModal } from "./crypto";
 
 export class VaultsModal extends Modal {

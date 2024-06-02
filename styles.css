@@ -86,3 +86,9 @@ If your plugin does not need CSS, delete this file.
 .fatal {
     background-color: var(--color-red) !important;
 }
+
+
+.scroll {
+    overflow-y: auto;
+    height: var(--dialog-max-height);;
+}

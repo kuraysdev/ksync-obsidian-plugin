@@ -2,7 +2,7 @@ import axios from "axios";
 import { Notice, TAbstractFile, TFolder, Vault } from "obsidian"
 import KSyncPlugin from "src/main";
 import { decrypt, encrypt, hash } from "src/util/CryptoHelper";
-import { FileMeta } from "src/util/FileUtil";
+import { FileMeta, IFile } from "src/types/file";
 
 export class VaultService {
     public tempBasePath = '.ksync';
@@ -146,11 +146,3 @@ export class VaultService {
 }
 
 
-interface IFile {
-    path: string;
-    size: number;
-    hash: string;
-    ctime: number;
-    mtime: number;
-    deleted: boolean;
-}

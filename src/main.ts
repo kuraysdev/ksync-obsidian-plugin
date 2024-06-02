@@ -36,10 +36,13 @@ export default class KSyncPlugin extends Plugin {
 	langs: LocaleManager;
 
 	async onload() {
+		//Init main services
 		this.logger = new Logger();
+		this.langs = new LocaleManager();
+
 		await this.loadSettings();
 		this.registerEvents();
-		this.langs = new LocaleManager();
+		
 
 		this.langs.registerLocales();
 		this.api = new API(this, this.settings.server);

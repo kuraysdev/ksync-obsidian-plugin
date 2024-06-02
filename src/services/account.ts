@@ -1,5 +1,5 @@
 import KSyncPlugin from "src/main";
-import { WarningModal } from "src/modals/warning";
+import { IAccountData, IDevice } from "src/types/user";
 
 export class Account {
     public plugin: KSyncPlugin;
@@ -55,26 +55,4 @@ export class Account {
         this.data = data;
         return data
     }
-}
-
-export interface IAccountData {
-    email: string;
-    subscription: string;
-    space: string;
-    vaults: IVault[];
-}
-
-export interface IVault {
-    id: string;
-    name: string;
-}
-
-export interface IDevice {
-    name: string;
-    type: DeviceType;
-}
-
-enum DeviceType {
-    PHONE,
-    DESKTOP
 }

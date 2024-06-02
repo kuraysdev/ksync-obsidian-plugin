@@ -1,6 +1,6 @@
 import { App, ButtonComponent, Modal, Setting } from "obsidian";
 import KSyncPlugin from "src/main";
-import { IDevice } from "src/services/account";
+import { IDevice } from "src/types/user";
 
 export class DevicesModal extends Modal {
 	private login: string;
