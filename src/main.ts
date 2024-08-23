@@ -1,5 +1,5 @@
 import { moment, Plugin } from "obsidian";
-import { SampleSettingTab as KSyncSettingTab } from "./settings";
+import { ReactSettingsTab, SampleSettingTab as KSyncSettingTab } from "./settings";
 import { LoginModal } from "./modals/login";
 import { SampleModal } from "./modals/debug";
 import { API } from "./services/api";
@@ -57,6 +57,7 @@ export default class KSyncPlugin extends Plugin {
 		this.settingsTab = new KSyncSettingTab(this.app, this)
 		this.addRibbonIcon("cloud", "KSync", (evt: MouseEvent) => new FileManagerModal(this.app, this).open());
 		this.addSettingTab(this.settingsTab);
+		this.addSettingTab(new ReactSettingsTab(this.app, this));
 		this.addCommand({
 			id: "sync",
 			name: "Sync Vault",

@@ -21,5 +21,5 @@
   },
   "include": [
     "**/*.ts"
-, "src/modals/filemanager.tsx"  ]
+, "src/modals/filemanager.tsx", "src/settings.tsx"  ]
 }
